@@ -7,6 +7,7 @@ from __future__ import print_function
 # imports
 import tensorflow as tf
 import tensorflow_hub as hub
+from openvino.inference_engine import IENetwork, IECore
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
