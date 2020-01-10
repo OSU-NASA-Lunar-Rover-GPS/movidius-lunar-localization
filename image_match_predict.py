@@ -14,6 +14,7 @@ PREDICT_BATCH_SIZE = 10
 LMBDA = 100.
 INPUT_WIDTH = 224
 INPUT_HEIGHT = 224
+MODEL_DIR = "ovino_model/"
 
 
 def cnn_model_fn(features, labels, mode):
@@ -62,7 +63,7 @@ def cnn_model_fn(features, labels, mode):
         return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 
 
-deep_matcher = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="models/")
+deep_matcher = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir=MODEL_DIR)
 
 
 def _input_parser(example):
