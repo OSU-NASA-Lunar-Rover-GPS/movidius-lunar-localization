@@ -72,7 +72,7 @@ singledispatch==3.4.0.3
 six==1.13.0
 subprocess32==3.5.4
 tensorboard==1.14.0
-tensorflow==1.14.0
+tensorflow==1.15.0
 tensorflow-estimator==1.14.0
 tensorflow-hub==0.7.0
 termcolor==1.1.0
