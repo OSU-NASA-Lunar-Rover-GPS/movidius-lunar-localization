@@ -26,7 +26,7 @@ INPUT_WIDTH = 224
 INPUT_HEIGHT = 224
 MODEL_XML = "./ovino_model/model.ckpt-370000.xml"
 MODEL_BIN = os.path.splitext(MODEL_XML)[0] + ".bin"
-CAMERA_DEVICE_NUMBER = 2
+CAMERA_DEVICE_NUMBER = 0
 
 
 def build_argparser():
@@ -81,78 +81,99 @@ def build_argparser():
 #                 }
 
 
+class gui(tk.Tk):
+
+    def __init__(self, parent, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+
+        self.parent = parent
+
+        self.topframe = tk.Frame(self.parent)
+        self.topframe.pack(side="top",expand=False)
+
+        self.bottomframe = tk.Frame(self.parent)
+        self.bottomframe.pack(side="top",expand=False)
+
+        self.panelA = None
+        self.panelB = None
+        self.panelC = None
+        self.panelD = None
+        #self.panelE = None
+        self.cam_img = [None, None, None, None]
+
+    def capture_location(self):
+
+        # initialize camera array
+
+        for i in range(4):
+            # capture image
+            cam = cv2.VideoCapture(CAMERA_DEVICE_NUMBER)
+            ret, frame = cam.read()
+            cam.release()
+
+            # convert to grayscale
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            ### post process
+            # convert to PIL
+            self.cam_img[i] = Image.fromarray(frame)
+
+            # resize for interface
+            self.cam_img[i] = self.cam_img[i].resize((320, 180), Image.ANTIALIAS)
+
+            # convert to ImageTk
+            self.cam_img[i] = ImageTk.PhotoImage(self.cam_img[i])
+
+            time.sleep(1)
+
+        # create interface
+
+        if self.panelA is None or self.panelB is None or self.panelC is None or self.panelD is None:
+            self.panelA = tk.Label(self.topframe, image=self.cam_img[0])
+            self.panelA.image = self.cam_img[0]
+            self.panelA.pack(side="left", padx=10, pady=10)
+
+            self.panelB = tk.Label(self.topframe, image=self.cam_img[1])
+            self.panelB.image = self.cam_img[1]
+            self.panelB.pack(side="left", padx=10, pady=10)
+
+            self.panelC = tk.Label(self.topframe, image=self.cam_img[2])
+            self.panelC.image = self.cam_img[2]
+            self.panelC.pack(side="left", padx=10, pady=10)
+
+            self.panelD = tk.Label(self.topframe, image=self.cam_img[3])
+            self.panelD.image = self.cam_img[3]
+            self.panelD.pack(side="left", padx=10, pady=10)
+
+            # self.panelE = tk.Label(image=reprojection)
+            # self.panelE.image = reprojection
+            # self.panelE.pack(side="right", padx=10, pady=10)
+            button = tk.Button(self.bottomframe, text="Capture Location", command=self.capture_location)
+            button.pack(fill=tk.X, padx=10, pady=10)
+        else:
+            # update the pannels
+            self.panelA.configure(image=self.cam_img[0])
+            self.panelB.configure(image=self.cam_img[1])
+            self.panelC.configure(image=self.cam_img[2])
+            self.panelD.configure(image=self.cam_img[3])
+            # self.panelE.configure(image=reprojection)
+            self.panelA.image = self.cam_img[0]
+            self.panelB.image = self.cam_img[1]
+            self.panelC.image = self.cam_img[2]
+            self.panelD.image = self.cam_img[3]
+            # self.panelE.image = reprojection
+
 
 def main():
-
-    global panelA, panelB, panelC, panelD
-    panelA = None
-    panelB = None
-    panelC = None
-    panelD = None
 
     # parse arguments
     args = build_argparser().parse_args()
 
-    # create window
     root = tk.Tk()
+    root.title("Lunar Localization Program")
+    main_gui = gui(root)
 
-    # initialize camera array
-    cam_img = []
-
-
-    for i in range(4):
-
-        # capture image
-        cam = cv2.VideoCapture(CAMERA_DEVICE_NUMBER)
-        ret, frame = cam.read()
-        cam.release()
-
-        ### post process
-        # convert to PIL
-        cam_img.append(Image.fromarray(frame))
-
-        # resize for interface
-        cam_img[i] = cam_img[i].resize((320, 180), Image.ANTIALIAS)
-
-        # convert to ImageTk
-        cam_img[i] = ImageTk.PhotoImage(cam_img[i])
-
-        time.sleep(3)
-
-    # create interface
-
-    if panelA is None or panelB is None or panelC is None or panelD is None:
-        panelA = tk.Label(image=cam_img[0])
-        panelA.image = cam_img[0]
-        panelA.pack(side="left", padx=10, pady=10)
-
-        panelB = tk.Label(image=cam_img[1])
-        panelB.image = cam_img[1]
-        panelB.pack(side="left", padx=10, pady=10)
-
-        panelC = tk.Label(image=cam_img[2])
-        panelC.image = cam_img[2]
-        panelC.pack(side="left", padx=10, pady=10)
-
-        panelD = tk.Label(image=cam_img[3])
-        panelD.image = cam_img[3]
-        panelD.pack(side="left", padx=10, pady=10)
-
-        # panelE = tk.Label(image=reprojection)
-        # panelE.image = reprojection
-        # panelE.pack(side="right", padx=10, pady=10)
-    else:
-        # update the pannels
-        panelA.configure(image=cam_img[0])
-        panelB.configure(image=cam_img[1])
-        panelC.configure(image=cam_img[2])
-        panelD.configure(image=cam_img[3])
-        # panelE.configure(image=reprojection)
-        panelA.image = cam_img[0]
-        panelB.image = cam_img[1]
-        panelC.image = cam_img[2]
-        panelD.image = cam_img[3]
-        # panelE.image = reprojection
+    main_gui.capture_location()
 
     ### display interface
     root.mainloop()
