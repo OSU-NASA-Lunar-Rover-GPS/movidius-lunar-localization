@@ -56,10 +56,11 @@ prometheus-client==0.7.1
 prompt-toolkit==1.0.18
 protobuf==3.10.0
 ptyprocess==0.6.0
+pycairo==1.18.2
 pycrypto==2.6.1
 pyflakes==1.6.0
 Pygments==2.4.2
-pygobject==3.26.1
+PyGObject==3.34.0
 pyrsistent==0.15.5
 python-dateutil==2.8.1
 pyxdg==0.25
