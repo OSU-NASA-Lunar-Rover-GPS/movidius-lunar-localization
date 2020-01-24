@@ -3,6 +3,7 @@ import sys
 import os
 import time
 from argparse import ArgumentParser, SUPPRESS
+import threading
 import numpy as np
 import math
 import tkinter as tk
@@ -11,9 +12,9 @@ from PIL import ImageTk
 import cv2 as cv
 import tensorflow as tf
 import tensorflow_hub as hub
-#from openvino.inference_engine import IENetwork, IECore, IEPlugin
+from openvino.inference_engine import IENetwork, IECore, IEPlugin
 
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
+
 
 PREDICT_BATCH_SIZE = 10
 LMBDA = 100
@@ -22,6 +23,8 @@ INPUT_HEIGHT = 224
 MODEL_XML = "./ovino_model/model.ckpt-370000.xml"
 MODEL_BIN = os.path.splitext(MODEL_XML)[0] + ".bin"
 CAMERA_DEVICE_NUMBER = 0
+
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
 
 
@@ -35,6 +38,8 @@ def build_argparser():
                            "Default value is MYRIAD", default="MYRIAD", type=str)
 
     return parser
+
+
 
 # def _input_parser(example):
 #
@@ -105,6 +110,7 @@ def reproj_fn(views):
     return total_image
 
 
+
 def reproject_multiple_rectilinears_to_aerial(images, specs):
 
     quiet_operation=True
@@ -161,16 +167,6 @@ def reproject_multiple_rectilinears_to_aerial(images, specs):
 
 
 
-def join(iterator, seperator):
-    it = map(str, iterator)
-    seperator = str(seperator)
-    string = next(it, '')
-    for s in it:
-        string += seperator + s
-    return string
-
-
-
 def reproject_rectilinear_to_aerial(img, fov_x=90, fov_y=90, camera_height=1, camera_pitch=0, camera_yaw=0, rover_pitch=0,
                                     rover_roll=0, desired_resolution=0.05, minimum_resolution=None, output_region_size=None, quiet_operation=True):
     # Calculate displacement of pixels in first-person perspective for top-down aerial view
@@ -198,6 +194,8 @@ def reproject_rectilinear_to_aerial(img, fov_x=90, fov_y=90, camera_height=1, ca
     #warped_img = rotate_aerial_image(warped_img, camera_yaw)
 
     return img, warped_img
+
+
 
 def rover_aerial_to_satellite_aerial(dxdz, dz, rover_pitch, rover_roll, quiet_operation=True):
     # Convert pixel displacements from rover top-down to satellite aerial
@@ -290,19 +288,6 @@ def warp_rectilinear_to_aerial(img, dxdz, dz, rotation_angle, desired_resolution
 
     return warped_img
 
-def rotate(points, angle, anchor=(0, 0)):
-    angle = (angle / 180.)*np.pi
-    xform = make_rotation_transformation(angle, anchor)
-    return [xform(p) for p in points]
-
-def make_rotation_transformation(angle, origin=(0, 0)):
-    cos_theta, sin_theta = np.cos(angle), np.sin(angle)
-    x0, y0 = origin
-    def xform(point):
-        x, y = point[0] - x0, point[1] - y0
-        return (x * cos_theta - y * sin_theta + x0,
-                x * sin_theta + y * cos_theta + y0)
-    return xform
 
 
 def filter_aerial_resolution(dxdz, dz, minimum_resolution=None, output_region_size =None, quiet_operation=True):
@@ -341,6 +326,7 @@ def filter_aerial_resolution(dxdz, dz, minimum_resolution=None, output_region_si
     return dxdz, dz
 
 
+
 def cut_horizon_from_image(img, fov_y_pix_angle, quiet_operation=True):
     if not quiet_operation:
         print('ALERT: Removing pixels above horizon from image.')
@@ -348,6 +334,8 @@ def cut_horizon_from_image(img, fov_y_pix_angle, quiet_operation=True):
     fov_y_pix_angle = fov_y_pix_angle[horizon_point:]
     img = img[horizon_point:, :]
     return img, fov_y_pix_angle
+
+
 
 def calculate_rectilinear_pixel_displacement(fov_x_pix_angle, fov_y_pix_angle, camera_height, quiet_operation=True):
     if not quiet_operation:
@@ -360,6 +348,8 @@ def calculate_rectilinear_pixel_displacement(fov_x_pix_angle, fov_y_pix_angle, c
     dxdz = np.dot(dz2, np.tan(fov_x_pix_angle))
 
     return dxdz, dz
+
+
 
 def calculate_rectilinear_pixel_angle(img, fov_x, fov_y, camera_pitch, quiet_operation=True):
     # Calculate displacement of pixels in first-person perspective for top-down aerial view
@@ -401,6 +391,36 @@ def calculate_rectilinear_pixel_angle(img, fov_x, fov_y, camera_pitch, quiet_ope
                                         (fov_x / 2))
     return fov_x_pix_angle, fov_y_pix_angle
 
+
+
+def join(iterator, seperator):
+    it = map(str, iterator)
+    seperator = str(seperator)
+    string = next(it, '')
+    for s in it:
+        string += seperator + s
+    return string
+
+
+
+def make_rotation_transformation(angle, origin=(0, 0)):
+    cos_theta, sin_theta = np.cos(angle), np.sin(angle)
+    x0, y0 = origin
+    def xform(point):
+        x, y = point[0] - x0, point[1] - y0
+        return (x * cos_theta - y * sin_theta + x0,
+                x * sin_theta + y * cos_theta + y0)
+    return xform
+
+
+
+def rotate(points, angle, anchor=(0, 0)):
+    angle = (angle / 180.)*np.pi
+    xform = make_rotation_transformation(angle, anchor)
+    return [xform(p) for p in points]
+
+
+
 ##### END FDL REPROJECTION SCRIPT
 
 class gui(tk.Tk):
@@ -413,6 +433,9 @@ class gui(tk.Tk):
         self.topframe = tk.Frame(self.parent)
         self.topframe.pack(side="top",expand=False)
 
+        self.secondframe = tk.Frame(self.parent)
+        self.secondframe.pack(side="top",expand=False)
+
         self.bottomframe = tk.Frame(self.parent)
         self.bottomframe.pack(side="top",expand=False)
 
@@ -421,6 +444,7 @@ class gui(tk.Tk):
         self.panelC = None
         self.panelD = None
         self.panelE = None
+        self.panelF = None
 
         self.cam_img = [None, None, None, None]
         self.cv_img = [None, None, None, None]
@@ -449,7 +473,8 @@ class gui(tk.Tk):
             # convert to ImageTk
             self.cam_img[i] = ImageTk.PhotoImage(self.cam_img[i])
 
-            time.sleep(1)
+            # delay placeholder for rotation
+            #time.sleep(1)
 
         # generate reprojection
         self.reprojection = reproj_fn(self.cv_img)
@@ -479,7 +504,7 @@ class gui(tk.Tk):
             self.panelE.image = self.reprojection
             self.panelE.pack(side="right", padx=10, pady=10)
 
-            button = tk.Button(self.bottomframe, text="Capture Location", command=self.capture_location)
+            button = tk.Button(self.secondframe, text="Capture Location", command=self.capture_location)
             button.pack(fill=tk.X, padx=10, pady=10)
         else:
             # update the pannels
@@ -494,6 +519,22 @@ class gui(tk.Tk):
             self.panelD.image = self.cam_img[3]
             self.panelE.image = self.reprojection
 
+        return
+
+
+
+    def process_reprojection(self):
+
+        if self.panelA is None:
+
+            self.panelF = tk.Label(self.bottomframe, image=self.cam_img[0])
+            self.panelF.image = self.cam_img[0]
+            self.panelF.pack(side="left", padx=10, pady=10)
+
+
+        return
+
+
 
 def main():
 
@@ -504,7 +545,8 @@ def main():
     root.title("Lunar Localization Program")
     main_gui = gui(root)
 
-    main_gui.capture_location()
+    camera_thread = threading.Thread(target=main_gui.capture_location)
+    camera_thread.start()
 
     ### display interface
     root.mainloop()
