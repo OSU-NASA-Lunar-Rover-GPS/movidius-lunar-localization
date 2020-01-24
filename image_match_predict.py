@@ -27,7 +27,7 @@ CAMERA_DEVICE_NUMBER = 0
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
 
-
+# parse command line arguments
 def build_argparser():
     parser = ArgumentParser(add_help=False)
     args = parser.add_argument_group('Options')
@@ -40,46 +40,46 @@ def build_argparser():
     return parser
 
 
+# parse tensorflow example
+def _input_parser(example):
 
-# def _input_parser(example):
-#
-#     features = {
-#         'height': tf.io.FixedLenFeature((), tf.int64),
-#         'width': tf.io.FixedLenFeature((), tf.int64),
-#         'offset_y': tf.io.FixedLenFeature((), tf.float32),
-#         'offset_x': tf.io.FixedLenFeature((), tf.float32),
-#         'match': tf.io.FixedLenFeature((), tf.int64),
-#         'iou': tf.io.FixedLenFeature((), tf.float32),
-#         'tile1_raw': tf.io.FixedLenFeature((), tf.string),
-#         'tile2_raw': tf.io.FixedLenFeature((), tf.string)
-#     }
-#
-#     parsed_example = tf.io.parse_single_example(example, features)
-#     width = parsed_example['width']
-#     height = parsed_example['height']
-#     tile1_img = tf.io.decode_raw(parsed_example['tile1_raw'], tf.uint8)
-#     tile2_img = tf.io.decode_raw(parsed_example['tile2_raw'], tf.uint8)
-#
-#     match = parsed_example['match']
-#     offset_x = parsed_example['offset_x']
-#     offset_y = parsed_example['offset_y']
-#
-#     metadata = {
-#         'offset_y': offset_y,
-#         'offset_x': offset_x,
-#         'match': parsed_example['match'],
-#         'iou': parsed_example['iou'],
-#         'width': width,
-#         'height': height}
-#
-#     return { "tile1_img": tile1_img,
-#              "tile2_img": tile2_img,
-#              "width": width,
-#              "height": height}, \
-#                 {   'match': match,
-#                     'offset_x': offset_x,
-#                     'offset_y': offset_y
-#                 }
+    features = {
+        'height': tf.io.FixedLenFeature((), tf.int64),
+        'width': tf.io.FixedLenFeature((), tf.int64),
+        'offset_y': tf.io.FixedLenFeature((), tf.float32),
+        'offset_x': tf.io.FixedLenFeature((), tf.float32),
+        'match': tf.io.FixedLenFeature((), tf.int64),
+        'iou': tf.io.FixedLenFeature((), tf.float32),
+        'tile1_raw': tf.io.FixedLenFeature((), tf.string),
+        'tile2_raw': tf.io.FixedLenFeature((), tf.string)
+    }
+
+    parsed_example = tf.io.parse_single_example(example, features)
+    width = parsed_example['width']
+    height = parsed_example['height']
+    tile1_img = tf.io.decode_raw(parsed_example['tile1_raw'], tf.uint8)
+    tile2_img = tf.io.decode_raw(parsed_example['tile2_raw'], tf.uint8)
+
+    match = parsed_example['match']
+    offset_x = parsed_example['offset_x']
+    offset_y = parsed_example['offset_y']
+
+    metadata = {
+        'offset_y': offset_y,
+        'offset_x': offset_x,
+        'match': parsed_example['match'],
+        'iou': parsed_example['iou'],
+        'width': width,
+        'height': height}
+
+    return { "tile1_img": tile1_img,
+             "tile2_img": tile2_img,
+             "width": width,
+             "height": height}, \
+                {   'match': match,
+                    'offset_x': offset_x,
+                    'offset_y': offset_y
+                }
 
 
 
@@ -449,6 +449,15 @@ class gui(tk.Tk):
         self.cam_img = [None, None, None, None]
         self.cv_img = [None, None, None, None]
         self.reprojection = None
+        self.tf_reprojection = None
+        self.threads = []
+
+    def run_capture(self):
+
+        self.threads.append(threading.Thread(target=self.capture_location))
+        self.threads[len(self.threads)-1].start()
+
+        return
 
     def capture_location(self):
 
@@ -484,6 +493,7 @@ class gui(tk.Tk):
 
         # create interface
         if self.panelA is None or self.panelB is None or self.panelC is None or self.panelD is None:
+
             self.panelA = tk.Label(self.topframe, image=self.cam_img[0])
             self.panelA.image = self.cam_img[0]
             self.panelA.pack(side="left", padx=10, pady=10)
@@ -504,10 +514,11 @@ class gui(tk.Tk):
             self.panelE.image = self.reprojection
             self.panelE.pack(side="right", padx=10, pady=10)
 
-            button = tk.Button(self.secondframe, text="Capture Location", command=self.capture_location)
+            button = tk.Button(self.secondframe, text="Capture Location", command=self.run_capture)
             button.pack(fill=tk.X, padx=10, pady=10)
+
         else:
-            # update the pannels
+            # update the panels
             self.panelA.configure(image=self.cam_img[0])
             self.panelB.configure(image=self.cam_img[1])
             self.panelC.configure(image=self.cam_img[2])
@@ -527,10 +538,14 @@ class gui(tk.Tk):
 
         if self.panelA is None:
 
-            self.panelF = tk.Label(self.bottomframe, image=self.cam_img[0])
+            self.panelF = tk.Label(self.bottomframe, image=self.tf_reprojection)
             self.panelF.image = self.cam_img[0]
             self.panelF.pack(side="left", padx=10, pady=10)
 
+        else:
+
+            self.panelF.configure(image=self.reprojection)
+            self.panelF.image = self.cam_img[0]
 
         return
 
