@@ -6,6 +6,7 @@ from argparse import ArgumentParser, SUPPRESS
 import threading
 import numpy as np
 import math
+import logging as log
 import tkinter as tk
 from PIL import Image
 from PIL import ImageTk
@@ -23,12 +24,14 @@ INPUT_HEIGHT = 224
 MODEL_XML = "./ovino_model/model.ckpt-370000.xml"
 MODEL_BIN = os.path.splitext(MODEL_XML)[0] + ".bin"
 CAMERA_DEVICE_NUMBER = 0
+ARGS = None
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
 
 # parse command line arguments
 def build_argparser():
+
     parser = ArgumentParser(add_help=False)
     args = parser.add_argument_group('Options')
     args.add_argument('-h', '--help', action='help', default=SUPPRESS, help='Show this help message and exit.')
@@ -426,6 +429,7 @@ def rotate(points, angle, anchor=(0, 0)):
 class gui(tk.Tk):
 
     def __init__(self, parent, *args, **kwargs):
+
         tk.Frame.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
@@ -447,18 +451,20 @@ class gui(tk.Tk):
         self.panelF = None
 
         self.cam_img = [None, None, None, None]
-        self.cv_img = [None, None, None, None]
         self.reprojection = None
         self.tf_reprojection = None
-        self.threads = []
+
+        self.cam_threads = []
         self.rep_thread = None
+
+        return
 
 
 
     def run_capture(self):
 
-        self.threads.append(threading.Thread(target=self.capture_location))
-        self.threads[len(self.threads)-1].start()
+        self.cam_threads.append(threading.Thread(target=self.capture_location))
+        self.cam_threads[len(self.cam_threads)-1].start()
 
         return
 
@@ -467,6 +473,7 @@ class gui(tk.Tk):
     def capture_location(self):
 
         # initialize camera array
+        cv_img = [None, None, None, None]
 
         for i in range(4):
             # capture image
@@ -475,11 +482,11 @@ class gui(tk.Tk):
             cam.release()
 
             # convert to grayscale
-            self.cv_img[i] = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+            cv_img[i] = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
             ### post process
             # convert to PIL
-            self.cam_img[i] = Image.fromarray(self.cv_img[i])
+            self.cam_img[i] = Image.fromarray(cv_img[i])
 
             # resize for interface
             self.cam_img[i] = self.cam_img[i].resize((380, 214), Image.ANTIALIAS)
@@ -491,11 +498,13 @@ class gui(tk.Tk):
             #time.sleep(1)
 
         # generate reprojection
-        self.reprojection = reproj_fn(self.cv_img)
+        self.reprojection = reproj_fn(cv_img)
         self.reprojection = Image.fromarray(self.reprojection)
         self.reprojection = self.reprojection.resize((214, 214), Image.ANTIALIAS)
         self.reprojection = ImageTk.PhotoImage(self.reprojection)
         self.update_camera_images()
+
+        return
 
     def update_camera_images(self):
 
@@ -553,13 +562,9 @@ class gui(tk.Tk):
 
     def process_reprojection(self):
 
-        # create Inference Engine
-        ie = IECore()
+        global PREDICT_BATCH_SIZE, ARGS
 
-        plugin = IEPlugin(device="MYRIAD")
-
-        # load Intermediate Representation model
-        net = IENetwork(model=MODEL_XML, weights=MODEL_BIN)
+        images = None
 
         ### START REPROJECTION MATCHING
 
@@ -568,20 +573,56 @@ class gui(tk.Tk):
         predict_dataset = predict_dataset.map(_input_parser)
         predict_dataset = predict_dataset.batch(PREDICT_BATCH_SIZE)
 
+        predict_it = tf.compat.v1.data.make_one_shot_iterator(predict_dataset)
 
-        input_blob = next(iter(net.inputs))
-        output_blob = next(iter(net.outputs))
+        features, labels = predict_it.get_next()
 
-        n, c, h, w = net.inputs[input_blob].shape
-        images = np.ndarray(shape=(n, c, h, w))
+        tile1_images = tf.cast(features["tile1_img"], tf.float32)
+        tile2_images = tf.cast(features["tile2_img"], tf.float32)
 
-        for i in range(n):
-            tile1_image = tf.cast(predict_dataset["tile1_img"], tf.float32)
+        tile1_images = tf.reshape(tile1_images, (-1, INPUT_HEIGHT, INPUT_WIDTH))
+        tile2_images = tf.reshape(tile2_images, (-1, INPUT_HEIGHT, INPUT_WIDTH))
 
+        tile1_images = tf.stack((tile1_images, tile1_images, tile1_images), axis=3)
+        tile2_images = tf.stack((tile2_images, tile2_images, tile2_images), axis=3)
 
-        exec_net = ie.load_network(network=net, device_name=args.device)
-        res = exec_net.infer(inputs={input_blob: images})
-        res = res[output_blob]
+        # (batch_size, 2, 1792) combined feature map
+        #combined_feature_map = tf.stack([tile1_feature_maps, tile2_feature_maps],axis=1)
+        #combined_feature_map_flat = tf.reshape(combined_feature_map, [-1, 2 * 2048])
+
+        # create Inference Engine, load Intermediate Representation
+        ie = IECore()
+        IEPlugin.
+        net = IENetwork(model=MODEL_XML, weights=MODEL_BIN)
+
+        if "MYRIAD" in ARGS.device:
+            supported_layers = ie.query_network(net, "MYRIAD")
+            not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
+            if len(not_supported_layers) != 0:
+                log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
+                          format(ARGS.device, ', '.join(not_supported_layers)))
+        elif "CPU" in ARGS.device:
+            supported_layers = ie.query_network(net, "CPU")
+            not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
+            if len(not_supported_layers) != 0:
+                log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
+                          format(ARGS.device, ', '.join(not_supported_layers)))
+
+        exec_net = ie.load_network(network=net, device_name=ARGS.device)
+        #
+        # input_blob = next(iter(net.inputs))
+        # output_blob = next(iter(net.outputs))
+        # n, c, h, w = net.inputs[input_blob].shape
+        # images = np.ndarray(shape=(n, c, h, w))
+        # res = exec_net.infer(inputs={input_blob: images})
+
+        # for i in range(n):
+        #     tile1_image = tf.cast(predict_dataset["tile1_img"], tf.float32)
+        #
+        #
+        # exec_net = ie.load_network(network=net, device_name=args.device)
+        # res = exec_net.infer(inputs={input_blob: images})
+        # res = res[output_blob]
 
         ### END REPROJECTION MATCHING
 
@@ -592,6 +633,12 @@ class gui(tk.Tk):
         #     input_fn=predict_dataset_input_fn)
         # for prediction in predictions:
         #     print(prediction)
+
+        # self.update_tf_images()
+
+        return
+
+
 
     def update_tf_images(self):
 
@@ -612,18 +659,17 @@ class gui(tk.Tk):
 
 def main():
 
+    global ARGS
+
     # parse arguments
-    args = build_argparser().parse_args()
+    ARGS = build_argparser().parse_args()
 
     root = tk.Tk()
     root.title("Lunar Localization Program")
     main_gui = gui(root)
 
-    camera_thread = threading.Thread(target=main_gui.capture_location)
-    camera_thread.start()
-
-    reprojection_thread = threading.Thread(target=main_gui.process_reprojection)
-    reprojection_thread.start()
+    main_gui.run_capture()
+    main_gui.run_reprojection()
 
     ### display interface
     root.mainloop()
