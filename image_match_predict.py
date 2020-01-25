@@ -451,6 +451,9 @@ class gui(tk.Tk):
         self.reprojection = None
         self.tf_reprojection = None
         self.threads = []
+        self.rep_thread = None
+
+
 
     def run_capture(self):
 
@@ -458,6 +461,8 @@ class gui(tk.Tk):
         self.threads[len(self.threads)-1].start()
 
         return
+
+
 
     def capture_location(self):
 
@@ -490,6 +495,9 @@ class gui(tk.Tk):
         self.reprojection = Image.fromarray(self.reprojection)
         self.reprojection = self.reprojection.resize((214, 214), Image.ANTIALIAS)
         self.reprojection = ImageTk.PhotoImage(self.reprojection)
+        self.update_camera_images()
+
+    def update_camera_images(self):
 
         # create interface
         if self.panelA is None or self.panelB is None or self.panelC is None or self.panelD is None:
@@ -534,18 +542,69 @@ class gui(tk.Tk):
 
 
 
+    def run_reprojection(self):
+
+        self.rep_thread = threading.Thread(target=self.process_reprojection)
+        self.rep_thread.start()
+
+        return
+
+
+
     def process_reprojection(self):
+
+        # create Inference Engine
+        ie = IECore()
+
+        plugin = IEPlugin(device="MYRIAD")
+
+        # load Intermediate Representation model
+        net = IENetwork(model=MODEL_XML, weights=MODEL_BIN)
+
+        ### START REPROJECTION MATCHING
+
+        predict_dataset = tf.data.TFRecordDataset('reproject_truematch_allbatch_5050match_224scale_06iou.tfr')
+
+        predict_dataset = predict_dataset.map(_input_parser)
+        predict_dataset = predict_dataset.batch(PREDICT_BATCH_SIZE)
+
+
+        input_blob = next(iter(net.inputs))
+        output_blob = next(iter(net.outputs))
+
+        n, c, h, w = net.inputs[input_blob].shape
+        images = np.ndarray(shape=(n, c, h, w))
+
+        for i in range(n):
+            tile1_image = tf.cast(predict_dataset["tile1_img"], tf.float32)
+
+
+        exec_net = ie.load_network(network=net, device_name=args.device)
+        res = exec_net.infer(inputs={input_blob: images})
+        res = res[output_blob]
+
+        ### END REPROJECTION MATCHING
+
+        # Create the Estimator
+        # deep_matcher = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="ovmodels/")
+
+        # predictions = deep_matcher.predict(
+        #     input_fn=predict_dataset_input_fn)
+        # for prediction in predictions:
+        #     print(prediction)
+
+    def update_tf_images(self):
 
         if self.panelA is None:
 
             self.panelF = tk.Label(self.bottomframe, image=self.tf_reprojection)
-            self.panelF.image = self.cam_img[0]
+            self.panelF.image = self.tf_reprojection
             self.panelF.pack(side="left", padx=10, pady=10)
 
         else:
 
-            self.panelF.configure(image=self.reprojection)
-            self.panelF.image = self.cam_img[0]
+            self.panelF.configure(image=self.tf_reprojection)
+            self.panelF.image = self.tf_reprojection
 
         return
 
@@ -563,70 +622,13 @@ def main():
     camera_thread = threading.Thread(target=main_gui.capture_location)
     camera_thread.start()
 
+    reprojection_thread = threading.Thread(target=main_gui.process_reprojection)
+    reprojection_thread.start()
+
     ### display interface
     root.mainloop()
 
-    # # create Inference Engine
-    # ie = IECore()
-    #
-    # plugin = IEPlugin(device="MYRIAD")
-    #
-    # # load Intermediate Representation model
-    # net = IENetwork(model=MODEL_XML, weights=MODEL_BIN)
-
-    ### START CAMERA
-
-    # open camera device 0
-    # cap = cv2.VideoCapture(0)
-
-    # take 4 pictures
-    # ret, frame = cap.read()
-
-    # generate reprojection
-
-    ### END CAMERA
-
-    ### START REPROJECTION MATCHING
-
-    # predict_dataset = tf.data.TFRecordDataset('reproject_truematch_allbatch_5050match_224scale_06iou.tfr')
-    #
-    # predict_dataset = predict_dataset.map(_input_parser)
-    # predict_dataset = predict_dataset.batch(PREDICT_BATCH_SIZE)
-
-    # # create Inference Engine
-    # ie = IECore()
-    #
-    # plugin = IEPlugin(device="MYRIAD")
-
-    ## load Intermediate Representation model
-    # net = IENetwork(model=MODEL_XML, weights=MODEL_BIN)
-    #
-    # net.batch_size = PREDICT_BATCH_SIZE
-    #
-    # input_blob = next(iter(net.inputs))
-    # output_blob = next(iter(net.outputs))
-    #
-    # n, c, h, w = net.inputs[input_blob].shape
-    # images = np.ndarray(shape=(n, c, h, w))
-    #
-    # for i in range(n):
-    #     tile1_image = tf.cast(predict_dataset["tile1_img"], tf.float32)
-    #
-    #
-    # exec_net = ie.load_network(network=net, device_name=args.device)
-    # res = exec_net.infer(inputs={input_blob: images})
-    # res = res[output_blob]
-
-    ### END REPROJECTION MATCHING
-
-    # Create the Estimator
-    # deep_matcher = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="ovmodels/")
-
-    # predictions = deep_matcher.predict(
-    #     input_fn=predict_dataset_input_fn)
-    # for prediction in predictions:
-    #     print(prediction)
-    # exit()
+    return
 
 
 if __name__ == "__main__":
