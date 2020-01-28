@@ -521,6 +521,9 @@ class gui(tk.Tk):
             # delay placeholder for rotation
             #time.sleep(1)
 
+        # reset servo position
+        ticcmd('--exit-safe-start', '--position', str(0))
+
         # generate reprojection
         self.reprojection = reproj_fn(cv_img)
         self.reprojection = Image.fromarray(self.reprojection)
