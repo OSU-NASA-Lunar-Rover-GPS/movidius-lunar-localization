@@ -494,14 +494,24 @@ class gui(tk.Tk):
 
         for i in range(4):
 
+            # rotate stepper controller to appropriate camera position
             ticcmd('--exit-safe-start', '--position', str(200 * i))
             status = yaml.load(ticcmd('-s', '--full'))
             position = status['Current position']
-            while position != (200 * i):
-                time.sleep(0.1)
+
+            timeout_length = 3 # 3 second timeout period
+            sleep_length = 0.1 # poll stepper every 0.1s
+
+            while position != (200 * i) and timeout_length > 0:
+                time.sleep(sleep_length)
                 status = yaml.load(ticcmd('-s', '--full'))
                 position = status['Current position']
+                timout_length = timeout_length - sleep_length
 
+            # handle timout condition
+            if timout_length <= 0:
+                print('ERROR: Stepper controller failed to assume the provided position.')
+                return
 
             # capture image
             cam = cv.VideoCapture(CAMERA_DEVICE_NUMBER)
