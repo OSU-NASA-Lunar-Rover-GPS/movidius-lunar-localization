@@ -2,18 +2,26 @@
 import sys
 import os
 import time
-from argparse import ArgumentParser, SUPPRESS
-import threading
 import numpy as np
 import math
 import logging as log
+# argument parsing
+from argparse import ArgumentParser, SUPPRESS
+# multithreading
+import threading
+# interface
 import tkinter as tk
 from PIL import Image
 from PIL import ImageTk
-import cv2 as cv
+# tensorflow
 import tensorflow as tf
 import tensorflow_hub as hub
+# stepper motor
+import subprocess
+import yaml
+# openvino
 from openvino.inference_engine import IENetwork, IECore, IEPlugin
+import cv2 as cv
 
 
 
@@ -23,7 +31,7 @@ INPUT_WIDTH = 224
 INPUT_HEIGHT = 224
 MODEL_XML = "./ovino_model/model.ckpt-370000.xml"
 MODEL_BIN = os.path.splitext(MODEL_XML)[0] + ".bin"
-CAMERA_DEVICE_NUMBER = 0
+CAMERA_DEVICE_NUMBER = 2
 ARGS = None
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
@@ -42,6 +50,8 @@ def build_argparser():
 
     return parser
 
+def ticcmd(*args):
+  return subprocess.check_output(['ticcmd'] + list(args))
 
 # parse tensorflow example
 def _input_parser(example):
@@ -475,7 +485,21 @@ class gui(tk.Tk):
         # initialize camera array
         cv_img = [None, None, None, None]
 
+        # gather stepper controller status
+        status = yaml.load(ticcmd('-s', '--full'))
+        position = status['Current position']
+
         for i in range(4):
+
+            ticcmd('--exit-safe-start', '--position', str(200 * i))
+            status = yaml.load(ticcmd('-s', '--full'))
+            position = status['Current position']
+            while position != (200 * i):
+                time.sleep(0.1)
+                status = yaml.load(ticcmd('-s', '--full'))
+                position = status['Current position']
+
+
             # capture image
             cam = cv.VideoCapture(CAMERA_DEVICE_NUMBER)
             ret, img = cam.read()
@@ -592,23 +616,22 @@ class gui(tk.Tk):
 
         # create Inference Engine, load Intermediate Representation
         ie = IECore()
-        IEPlugin.
         net = IENetwork(model=MODEL_XML, weights=MODEL_BIN)
 
-        if "MYRIAD" in ARGS.device:
-            supported_layers = ie.query_network(net, "MYRIAD")
-            not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
-            if len(not_supported_layers) != 0:
-                log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
-                          format(ARGS.device, ', '.join(not_supported_layers)))
-        elif "CPU" in ARGS.device:
-            supported_layers = ie.query_network(net, "CPU")
-            not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
-            if len(not_supported_layers) != 0:
-                log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
-                          format(ARGS.device, ', '.join(not_supported_layers)))
-
-        exec_net = ie.load_network(network=net, device_name=ARGS.device)
+        # if "MYRIAD" in ARGS.device:
+        #     supported_layers = ie.query_network(net, "MYRIAD")
+        #     not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
+        #     if len(not_supported_layers) != 0:
+        #         log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
+        #                   format(ARGS.device, ', '.join(not_supported_layers)))
+        # elif "CPU" in ARGS.device:
+        #     supported_layers = ie.query_network(net, "CPU")
+        #     not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
+        #     if len(not_supported_layers) != 0:
+        #         log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
+        #                   format(ARGS.device, ', '.join(not_supported_layers)))
+        #
+        # exec_net = ie.load_network(network=net, device_name=ARGS.device)
         #
         # input_blob = next(iter(net.inputs))
         # output_blob = next(iter(net.outputs))
