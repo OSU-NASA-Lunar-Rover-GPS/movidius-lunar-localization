@@ -487,6 +487,9 @@ class gui(tk.Tk):
 
         # gather stepper controller status
         status = yaml.load(ticcmd('-s', '--full'))
+        if status['Operation State'] != 'Normal':
+            print('ERROR: Stepper controller is not operating correctly. State: ' + status['Operation State'] + ', Voltage: ' + status['VIN voltage'])
+            return
         position = status['Current position']
 
         for i in range(4):
