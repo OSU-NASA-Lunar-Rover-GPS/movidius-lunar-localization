@@ -3,7 +3,7 @@
 source /opt/intel/openvino/bin/setupvars.sh;
 
 /opt/intel/openvino/deployment_tools/model_optimizer/mo_tf.py \
-  --input_meta_graph ./tf_model/model.ckpt-370000.meta \
+  --input_meta_graph ./tfv2_model/model.ckpt-370000.meta \
   --batch 1 \
   --data_type FP16 \
   --output_dir ./ovino_model/;

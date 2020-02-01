@@ -16,12 +16,12 @@ from PIL import ImageTk
 # tensorflow
 import tensorflow as tf
 import tensorflow_hub as hub
-# stepper motor
-import subprocess
-import yaml
 # openvino
 from openvino.inference_engine import IENetwork, IECore, IEPlugin
 import cv2 as cv
+# stepper motor
+import subprocess
+import yaml
 
 
 
@@ -29,12 +29,15 @@ PREDICT_BATCH_SIZE = 10
 LMBDA = 100
 INPUT_WIDTH = 224
 INPUT_HEIGHT = 224
-MODEL_XML = "./ovino_model/model.ckpt-370000.xml"
+MODEL_XML = "./ovino_model/model.xml"
+#MODEL_XML = "./ovino_model/model.ckpt-370000.xml" # pretrained tensorflow v1 model
 MODEL_BIN = os.path.splitext(MODEL_XML)[0] + ".bin"
-CAMERA_DEVICE_NUMBER = 2
+CAMERA_DEVICE_NUMBER = 0
 ARGS = None
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
+tf.compat.v1.disable_eager_execution()
+
 
 
 # parse command line arguments
@@ -50,49 +53,11 @@ def build_argparser():
 
     return parser
 
+
+
+# stepper motor controller (requires ticcmd binary
 def ticcmd(*args):
   return subprocess.check_output(['ticcmd'] + list(args))
-
-# parse tensorflow example
-def _input_parser(example):
-
-    features = {
-        'height': tf.io.FixedLenFeature((), tf.int64),
-        'width': tf.io.FixedLenFeature((), tf.int64),
-        'offset_y': tf.io.FixedLenFeature((), tf.float32),
-        'offset_x': tf.io.FixedLenFeature((), tf.float32),
-        'match': tf.io.FixedLenFeature((), tf.int64),
-        'iou': tf.io.FixedLenFeature((), tf.float32),
-        'tile1_raw': tf.io.FixedLenFeature((), tf.string),
-        'tile2_raw': tf.io.FixedLenFeature((), tf.string)
-    }
-
-    parsed_example = tf.io.parse_single_example(example, features)
-    width = parsed_example['width']
-    height = parsed_example['height']
-    tile1_img = tf.io.decode_raw(parsed_example['tile1_raw'], tf.uint8)
-    tile2_img = tf.io.decode_raw(parsed_example['tile2_raw'], tf.uint8)
-
-    match = parsed_example['match']
-    offset_x = parsed_example['offset_x']
-    offset_y = parsed_example['offset_y']
-
-    metadata = {
-        'offset_y': offset_y,
-        'offset_x': offset_x,
-        'match': parsed_example['match'],
-        'iou': parsed_example['iou'],
-        'width': width,
-        'height': height}
-
-    return { "tile1_img": tile1_img,
-             "tile2_img": tile2_img,
-             "width": width,
-             "height": height}, \
-                {   'match': match,
-                    'offset_x': offset_x,
-                    'offset_y': offset_y
-                }
 
 
 
@@ -436,6 +401,8 @@ def rotate(points, angle, anchor=(0, 0)):
 
 ##### END FDL REPROJECTION SCRIPT
 
+
+
 class gui(tk.Tk):
 
     def __init__(self, parent, *args, **kwargs):
@@ -453,16 +420,17 @@ class gui(tk.Tk):
         self.bottomframe = tk.Frame(self.parent)
         self.bottomframe.pack(side="top",expand=False)
 
-        self.panelA = None
-        self.panelB = None
-        self.panelC = None
-        self.panelD = None
-        self.panelE = None
-        self.panelF = None
+        self.panelCam0 = None
+        self.panelCam90 = None
+        self.panelCam180 = None
+        self.panelCam270 = None
+        self.panelCamRep = None
+        self.panelTFRep = None
 
         self.cam_img = [None, None, None, None]
         self.reprojection = None
         self.tf_reprojection = None
+        self.tf_satellite = None
 
         self.cam_threads = []
         self.rep_thread = None
@@ -482,36 +450,46 @@ class gui(tk.Tk):
 
     def capture_location(self):
 
+        camera_connected = True
+
         # initialize camera array
         cv_img = [None, None, None, None]
 
         # gather stepper controller status
-        status = yaml.load(ticcmd('-s', '--full'))
-        if status['Operation State'] != 'Normal':
-            print('ERROR: Stepper controller is not operating correctly. State: ' + status['Operation State'] + ', Voltage: ' + status['VIN voltage'])
-            return
-        position = status['Current position']
+        try:
+            status = yaml.load(ticcmd('-s', '--full'))
+            if status['Operation State'] != 'Normal':
+                print('ERROR: Stepper controller is not operating correctly. State: ' + status['Operation State'] + ', Voltage: ' + status['VIN voltage'])
+                return
+            position = status['Current position']
+        except:
+            camera_connected = False
+
 
         for i in range(4):
-
-            # rotate stepper controller to appropriate camera position
-            ticcmd('--exit-safe-start', '--position', str(200 * i))
-            status = yaml.load(ticcmd('-s', '--full'))
-            position = status['Current position']
 
             timeout_length = 3 # 3 second timeout period
             sleep_length = 0.1 # poll stepper every 0.1s
 
-            while position != (200 * i) and timeout_length > 0:
-                time.sleep(sleep_length)
+            if camera_connected:
+                # rotate stepper controller to appropriate camera position
+                ticcmd('--exit-safe-start', '--position', str(200 * i))
                 status = yaml.load(ticcmd('-s', '--full'))
                 position = status['Current position']
-                timout_length = timeout_length - sleep_length
 
-            # handle timout condition
-            if timout_length <= 0:
-                print('ERROR: Stepper controller failed to assume the provided position.')
-                return
+
+                while position != (200 * i) and timeout_length > 0:
+                    time.sleep(sleep_length)
+                    status = yaml.load(ticcmd('-s', '--full'))
+                    position = status['Current position']
+                    timout_length = timeout_length - sleep_length
+
+                # handle timout condition
+                if timout_length <= 0:
+                    print('ERROR: Stepper controller failed to assume the provided position.')
+                    return
+            else:
+                time.sleep(1)
 
             # capture image
             cam = cv.VideoCapture(CAMERA_DEVICE_NUMBER)
@@ -531,61 +509,62 @@ class gui(tk.Tk):
             # convert to ImageTk
             self.cam_img[i] = ImageTk.PhotoImage(self.cam_img[i])
 
-            # delay placeholder for rotation
-            #time.sleep(1)
-
-        # reset servo position
-        ticcmd('--exit-safe-start', '--position', str(0))
+        if camera_connected:
+            # reset servo position
+            ticcmd('--exit-safe-start', '--position', str(0))
 
         # generate reprojection
         self.reprojection = reproj_fn(cv_img)
         self.reprojection = Image.fromarray(self.reprojection)
         self.reprojection = self.reprojection.resize((214, 214), Image.ANTIALIAS)
         self.reprojection = ImageTk.PhotoImage(self.reprojection)
+
         self.update_camera_images()
 
         return
 
+
+
     def update_camera_images(self):
 
         # create interface
-        if self.panelA is None or self.panelB is None or self.panelC is None or self.panelD is None:
+        if self.panelCam0 is None or self.panelCam90 is None or self.panelCam180 is None or self.panelCam270 is None:
 
-            self.panelA = tk.Label(self.topframe, image=self.cam_img[0])
-            self.panelA.image = self.cam_img[0]
-            self.panelA.pack(side="left", padx=10, pady=10)
+            self.panelCam0 = tk.Label(self.topframe, image=self.cam_img[0])
+            self.panelCam0.image = self.cam_img[0]
+            self.panelCam0.pack(side="left", padx=10, pady=10)
 
-            self.panelB = tk.Label(self.topframe, image=self.cam_img[1])
-            self.panelB.image = self.cam_img[1]
-            self.panelB.pack(side="left", padx=10, pady=10)
+            self.panelCam90 = tk.Label(self.topframe, image=self.cam_img[1])
+            self.panelCam90.image = self.cam_img[1]
+            self.panelCam90.pack(side="left", padx=10, pady=10)
 
-            self.panelC = tk.Label(self.topframe, image=self.cam_img[2])
-            self.panelC.image = self.cam_img[2]
-            self.panelC.pack(side="left", padx=10, pady=10)
+            self.panelCam180 = tk.Label(self.topframe, image=self.cam_img[2])
+            self.panelCam180.image = self.cam_img[2]
+            self.panelCam180.pack(side="left", padx=10, pady=10)
 
-            self.panelD = tk.Label(self.topframe, image=self.cam_img[3])
-            self.panelD.image = self.cam_img[3]
-            self.panelD.pack(side="left", padx=10, pady=10)
+            self.panelCam270 = tk.Label(self.topframe, image=self.cam_img[3])
+            self.panelCam270.image = self.cam_img[3]
+            self.panelCam270.pack(side="left", padx=10, pady=10)
 
-            self.panelE = tk.Label(self.topframe, image=self.reprojection)
-            self.panelE.image = self.reprojection
-            self.panelE.pack(side="right", padx=10, pady=10)
+            self.panelCamRep = tk.Label(self.topframe, image=self.reprojection)
+            self.panelCamRep.image = self.reprojection
+            self.panelCamRep.pack(side="right", padx=10, pady=10)
 
             button = tk.Button(self.secondframe, text="Capture Location", command=self.run_capture)
             button.pack(fill=tk.X, padx=10, pady=10)
 
         else:
             # update the panels
-            self.panelA.configure(image=self.cam_img[0])
-            self.panelB.configure(image=self.cam_img[1])
-            self.panelC.configure(image=self.cam_img[2])
-            self.panelD.configure(image=self.cam_img[3])
-            self.panelE.configure(image=self.reprojection)
-            self.panelA.image = self.cam_img[0]
-            self.panelB.image = self.cam_img[1]
-            self.panelC.image = self.cam_img[2]
-            self.panelD.image = self.cam_img[3]
-            self.panelE.image = self.reprojection
+            self.panelCam0.configure(image=self.cam_img[0])
+            self.panelCam90.configure(image=self.cam_img[1])
+            self.panelCam180.configure(image=self.cam_img[2])
+            self.panelCam270.configure(image=self.cam_img[3])
+            self.panelCamRep.configure(image=self.reprojection)
+            self.panelCam0.image = self.cam_img[0]
+            self.panelCam90.image = self.cam_img[1]
+            self.panelCam180.image = self.cam_img[2]
+            self.panelCam270.image = self.cam_img[3]
+            self.panelCamRep.image = self.reprojection
 
         return
 
@@ -608,58 +587,100 @@ class gui(tk.Tk):
 
         ### START REPROJECTION MATCHING
 
-        predict_dataset = tf.data.TFRecordDataset('reproject_truematch_allbatch_5050match_224scale_06iou.tfr')
-
-        predict_dataset = predict_dataset.map(_input_parser)
-        predict_dataset = predict_dataset.batch(PREDICT_BATCH_SIZE)
-
-        predict_it = tf.compat.v1.data.make_one_shot_iterator(predict_dataset)
-
-        features, labels = predict_it.get_next()
-
-        tile1_images = tf.cast(features["tile1_img"], tf.float32)
-        tile2_images = tf.cast(features["tile2_img"], tf.float32)
-
-        tile1_images = tf.reshape(tile1_images, (-1, INPUT_HEIGHT, INPUT_WIDTH))
-        tile2_images = tf.reshape(tile2_images, (-1, INPUT_HEIGHT, INPUT_WIDTH))
-
-        tile1_images = tf.stack((tile1_images, tile1_images, tile1_images), axis=3)
-        tile2_images = tf.stack((tile2_images, tile2_images, tile2_images), axis=3)
-
-        # (batch_size, 2, 1792) combined feature map
-        #combined_feature_map = tf.stack([tile1_feature_maps, tile2_feature_maps],axis=1)
-        #combined_feature_map_flat = tf.reshape(combined_feature_map, [-1, 2 * 2048])
-
         # create Inference Engine, load Intermediate Representation
         ie = IECore()
         net = IENetwork(model=MODEL_XML, weights=MODEL_BIN)
 
-        # if "MYRIAD" in ARGS.device:
-        #     supported_layers = ie.query_network(net, "MYRIAD")
-        #     not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
-        #     if len(not_supported_layers) != 0:
-        #         log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
-        #                   format(ARGS.device, ', '.join(not_supported_layers)))
-        # elif "CPU" in ARGS.device:
-        #     supported_layers = ie.query_network(net, "CPU")
-        #     not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
-        #     if len(not_supported_layers) != 0:
-        #         log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
-        #                   format(ARGS.device, ', '.join(not_supported_layers)))
-        #
-        # exec_net = ie.load_network(network=net, device_name=ARGS.device)
-        #
-        # input_blob = next(iter(net.inputs))
-        # output_blob = next(iter(net.outputs))
+        if "MYRIAD" in ARGS.device:
+            supported_layers = ie.query_network(net, "MYRIAD")
+            not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
+            if len(not_supported_layers) != 0:
+                log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
+                          format(ARGS.device, ', '.join(not_supported_layers)))
+        elif "CPU" in ARGS.device:
+            supported_layers = ie.query_network(net, "CPU")
+            not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
+            if len(not_supported_layers) != 0:
+                log.error("Following layers are not supported by the plugin for specified device {}:\n {}".
+                          format(ARGS.device, ', '.join(not_supported_layers)))
+
+        # create blobs for inference input_output
+        input_blob = next(iter(net.inputs))
+        output_blob = next(iter(net.outputs))
+
+        # load tensorflow record
+        predict_dataset = tf.data.TFRecordDataset('reproject_truematch_allbatch_5050match_224scale_06iou.tfr')
+
+        predict_dataset = predict_dataset.map(_input_parser)
+        predict_dataset = predict_dataset.batch(1)
+        #predict_dataset = predict_dataset.batch(PREDICT_BATCH_SIZE)
+        iterator = tf.compat.v1.data.make_one_shot_iterator(predict_dataset)
+
+        features, labels = iterator.get_next()
+
+        #exec_net = ie.load_network(network=net, device_name=ARGS.device)
+
+        with tf.compat.v1.Session() as sess:
+
+            sess.run(tf.compat.v1.global_variables_initializer())
+
+            try:
+                while True:
+                    image = sess.run([features, labels])
+
+                    tile1_image = tf.cast(features["tile1_img"], tf.uint8)
+                    tile2_image = tf.cast(features["tile2_img"], tf.uint8)
+
+                    tile1_image = tf.reshape(tile1_image, (-1, INPUT_HEIGHT, INPUT_WIDTH))
+                    tile2_image = tf.reshape(tile2_image, (-1, INPUT_HEIGHT, INPUT_WIDTH))
+
+                    tile1_image = tf.stack((tile1_image, tile1_image, tile1_image), axis=3)[0]
+                    tile2_image = tf.stack((tile2_image, tile2_image, tile2_image), axis=3)[0]
+
+                    self.tf_reprojection = Image.fromarray(tile1_image.eval())
+                    self.tf_satellite = Image.fromarray(tile2_image.eval())
+
+                    self.tf_reprojection = ImageTk.PhotoImage(image=self.tf_reprojection)
+                    self.tf_satellite = ImageTk.PhotoImage(image=self.tf_satellite)
+
+                    self.update_tf_images()
+                    time.sleep(5)
+
+                    ## view tfrecord images for debugging
+                    # cv.namedWindow('image0', cv.WINDOW_NORMAL)
+                    # cv.namedWindow('image1', cv.WINDOW_NORMAL)
+                    #
+                    # cv.imshow('image0', img1)
+                    # cv.imshow('image1', img2)
+                    #
+                    # cv.resizeWindow('image0', 800, 800)
+                    # cv.resizeWindow('image1', 800, 800)
+                    #
+                    # cv.waitKey(0)
+                    # cv.destroyAllWindows()
+
+                    #res1 = exec_net.infer(inputs={input_blob: img1})
+                    #res2 = exec_net.infer(inputs={input_blob: tile1_image.eval()})
+
+
+            except tf.errors.OutOfRangeError:
+                 pass
+
         # n, c, h, w = net.inputs[input_blob].shape
         # images = np.ndarray(shape=(n, c, h, w))
-        # res = exec_net.infer(inputs={input_blob: images})
+
+
+        #combined_feature_map = tf.stack([tile1_feature_maps, tile2_feature_maps],axis=1)
+        #combined_feature_map_flat = tf.reshape(combined_feature_map, [-1, 2 * 2048])
+
+
+        #label = tf.cast(features['train/label'], tf.int32)
+
 
         # for i in range(n):
         #     tile1_image = tf.cast(predict_dataset["tile1_img"], tf.float32)
         #
         #
-        # exec_net = ie.load_network(network=net, device_name=args.device)
         # res = exec_net.infer(inputs={input_blob: images})
         # res = res[output_blob]
 
@@ -681,18 +702,60 @@ class gui(tk.Tk):
 
     def update_tf_images(self):
 
-        if self.panelA is None:
+        if self.panelTFRep is None or self.panelTFSat is None:
 
-            self.panelF = tk.Label(self.bottomframe, image=self.tf_reprojection)
-            self.panelF.image = self.tf_reprojection
-            self.panelF.pack(side="left", padx=10, pady=10)
+            self.panelTFRep = tk.Label(self.bottomframe, image=self.tf_reprojection)
+            self.panelTFRep.image = self.tf_reprojection
+            self.panelTFRep.pack(side="left", padx=10, pady=10)
+
+            self.panelTFSat = tk.Label(self.bottomframe, image=self.tf_satellite)
+            self.panelTFSat.image = self.tf_satellite
+            self.panelTFSat.pack(side="left", padx=10, pady=10)
 
         else:
 
-            self.panelF.configure(image=self.tf_reprojection)
-            self.panelF.image = self.tf_reprojection
+            self.panelTFRep.configure(image=self.tf_reprojection)
+            self.panelTFRep.image = self.tf_reprojection
+
+            self.panelTFSat.configure(image=self.tf_satellite)
+            self.panelTFSat.image = self.tf_satellite
 
         return
+
+
+
+# parse tensorflow example
+def _input_parser(example):
+
+    features = {
+        'height': tf.io.FixedLenFeature((), tf.int64),
+        'width': tf.io.FixedLenFeature((), tf.int64),
+        'offset_y': tf.io.FixedLenFeature((), tf.float32),
+        'offset_x': tf.io.FixedLenFeature((), tf.float32),
+        'match': tf.io.FixedLenFeature((), tf.int64),
+        'iou': tf.io.FixedLenFeature((), tf.float32),
+        'tile1_raw': tf.io.FixedLenFeature((), tf.string),
+        'tile2_raw': tf.io.FixedLenFeature((), tf.string)
+    }
+
+    parsed_example = tf.io.parse_single_example(example, features)
+    width = parsed_example['width']
+    height = parsed_example['height']
+    tile1_img = tf.io.decode_raw(parsed_example['tile1_raw'], tf.int64)
+    tile2_img = tf.io.decode_raw(parsed_example['tile2_raw'], tf.int64)
+
+    match = parsed_example['match']
+    offset_x = parsed_example['offset_x']
+    offset_y = parsed_example['offset_y']
+
+    return { "tile1_img": tile1_img,
+             "tile2_img": tile2_img,
+             "width": width,
+             "height": height}, \
+                {   'match': match,
+                    'offset_x': offset_x,
+                    'offset_y': offset_y
+                }
 
 
 
@@ -714,6 +777,7 @@ def main():
     root.mainloop()
 
     return
+
 
 
 if __name__ == "__main__":
