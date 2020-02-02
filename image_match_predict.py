@@ -411,14 +411,8 @@ class gui(tk.Tk):
 
         self.parent = parent
 
-        self.topframe = tk.Frame(self.parent)
-        self.topframe.pack(side="top",expand=False)
-
-        self.secondframe = tk.Frame(self.parent)
-        self.secondframe.pack(side="top",expand=False)
-
-        self.bottomframe = tk.Frame(self.parent)
-        self.bottomframe.pack(side="top",expand=False)
+        self.masterframe = tk.Frame(self.parent)
+        self.masterframe.grid()
 
         self.panelCam0 = None
         self.panelCam90 = None
@@ -516,7 +510,7 @@ class gui(tk.Tk):
         # generate reprojection
         self.reprojection = reproj_fn(cv_img)
         self.reprojection = Image.fromarray(self.reprojection)
-        self.reprojection = self.reprojection.resize((214, 214), Image.ANTIALIAS)
+        self.reprojection = self.reprojection.resize((448, 448), Image.NEAREST)
         self.reprojection = ImageTk.PhotoImage(self.reprojection)
 
         self.update_camera_images()
@@ -530,28 +524,28 @@ class gui(tk.Tk):
         # create interface
         if self.panelCam0 is None or self.panelCam90 is None or self.panelCam180 is None or self.panelCam270 is None:
 
-            self.panelCam0 = tk.Label(self.topframe, image=self.cam_img[0])
+            self.panelCam0 = tk.Label(self.masterframe, image=self.cam_img[0])
             self.panelCam0.image = self.cam_img[0]
-            self.panelCam0.pack(side="left", padx=10, pady=10)
+            self.panelCam0.grid(in_=self.masterframe, row=0, column=0, padx=10, pady=10, sticky='nw')
 
-            self.panelCam90 = tk.Label(self.topframe, image=self.cam_img[1])
+            self.panelCam90 = tk.Label(self.masterframe, image=self.cam_img[1])
             self.panelCam90.image = self.cam_img[1]
-            self.panelCam90.pack(side="left", padx=10, pady=10)
+            self.panelCam90.grid(in_=self.masterframe, row=0, column=1, padx=10, pady=10, sticky='nw')
 
-            self.panelCam180 = tk.Label(self.topframe, image=self.cam_img[2])
+            self.panelCam180 = tk.Label(self.masterframe, image=self.cam_img[2])
             self.panelCam180.image = self.cam_img[2]
-            self.panelCam180.pack(side="left", padx=10, pady=10)
+            self.panelCam180.grid(in_=self.masterframe, row=1, column=0, padx=10, pady=10, sticky='nw')
 
-            self.panelCam270 = tk.Label(self.topframe, image=self.cam_img[3])
+            self.panelCam270 = tk.Label(self.masterframe, image=self.cam_img[3])
             self.panelCam270.image = self.cam_img[3]
-            self.panelCam270.pack(side="left", padx=10, pady=10)
+            self.panelCam270.grid(in_=self.masterframe, row=1, column=1, padx=10, pady=10, sticky='nw')
 
-            self.panelCamRep = tk.Label(self.topframe, image=self.reprojection)
+            self.panelCamRep = tk.Label(self.masterframe, image=self.reprojection)
             self.panelCamRep.image = self.reprojection
-            self.panelCamRep.pack(side="right", padx=10, pady=10)
+            self.panelCamRep.grid(in_=self.masterframe, row=0, column=2, columnspan=2, rowspan=2, padx=10, pady=10, sticky='ne')
 
-            button = tk.Button(self.secondframe, text="Capture Location", command=self.run_capture)
-            button.pack(fill=tk.X, padx=10, pady=10)
+            button = tk.Button(self.masterframe, text="Capture Location", command=self.run_capture)
+            button.grid(in_=self.masterframe, row=2, column=2, padx=10, pady=10)
 
         else:
             # update the panels
@@ -706,13 +700,13 @@ class gui(tk.Tk):
 
         if self.panelTFRep is None or self.panelTFSat is None:
 
-            self.panelTFRep = tk.Label(self.bottomframe, image=self.tf_reprojection)
+            self.panelTFRep = tk.Label(self.masterframe, image=self.tf_reprojection)
             self.panelTFRep.image = self.tf_reprojection
-            self.panelTFRep.pack(side="left", padx=10, pady=10)
+            self.panelTFRep.grid(in_=self.masterframe, row=2, column=0, padx=10, pady=10)
 
-            self.panelTFSat = tk.Label(self.bottomframe, image=self.tf_satellite)
+            self.panelTFSat = tk.Label(self.masterframe, image=self.tf_satellite)
             self.panelTFSat.image = self.tf_satellite
-            self.panelTFSat.pack(side="left", padx=10, pady=10)
+            self.panelTFSat.grid(in_=self.masterframe, row=2, column=1, padx=10, pady=10)
 
         else:
 
