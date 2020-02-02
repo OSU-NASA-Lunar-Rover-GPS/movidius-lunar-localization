@@ -638,13 +638,15 @@ class gui(tk.Tk):
                     tile2_image = tf.stack((tile2_image, tile2_image, tile2_image), axis=3)[0]
 
                     self.tf_reprojection = Image.fromarray(tile1_image.eval())
-                    self.tf_satellite = Image.fromarray(tile2_image.eval())
-
+                    self.tf_reprojection = self.tf_reprojection.resize((448, 448), Image.NEAREST)
                     self.tf_reprojection = ImageTk.PhotoImage(image=self.tf_reprojection)
+
+                    self.tf_satellite = Image.fromarray(tile2_image.eval())
+                    self.tf_satellite = self.tf_satellite.resize((448, 448), Image.NEAREST)
                     self.tf_satellite = ImageTk.PhotoImage(image=self.tf_satellite)
 
                     self.update_tf_images()
-                    time.sleep(5)
+                    time.sleep(3)
 
                     ## view tfrecord images for debugging
                     # cv.namedWindow('image0', cv.WINDOW_NORMAL)
