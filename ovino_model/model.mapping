@@ -1,0 +1,635 @@
+<?xml version="1.0" ?>
+<mapping>
+	<map>
+		<framework name="gpu_0/res4_0_branch1_1" out_port_id="gpu_0/res4_0_branch1_1"/>
+		<IR id="116" name="gpu_0/res4_0_branch1_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2b_bn_1" out_port_id="gpu_0/res2_1_branch2b_bn_1"/>
+		<IR id="30" name="Mul2_6115/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2c_bn_2" out_port_id="gpu_0/res4_4_branch2c_bn_2"/>
+		<IR id="171" name="gpu_0/res4_4_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2c_1" out_port_id="gpu_0/res4_4_branch2c_1"/>
+		<IR id="168" name="gpu_0/res4_4_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2b_1" out_port_id="gpu_0/res4_5_branch2b_1"/>
+		<IR id="177" name="gpu_0/res4_5_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2b_bn_1" out_port_id="gpu_0/res4_3_branch2b_bn_1"/>
+		<IR id="153" name="Mul2_6463/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2a_1" out_port_id="gpu_0/res3_2_branch2a_1"/>
+		<IR id="79" name="gpu_0/res3_2_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2a_bn_2" out_port_id="gpu_0/res4_2_branch2a_bn_2"/>
+		<IR id="137" name="gpu_0/res4_2_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2c_1" out_port_id="gpu_0/res4_5_branch2c_1"/>
+		<IR id="181" name="gpu_0/res4_5_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2b_bn_2" out_port_id="gpu_0/res4_2_branch2b_bn_2"/>
+		<IR id="141" name="gpu_0/res4_2_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2c_bn_2" out_port_id="gpu_0/res3_3_branch2c_bn_2"/>
+		<IR id="103" name="gpu_0/res3_3_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2a_bn_1" out_port_id="gpu_0/res4_1_branch2a_bn_1"/>
+		<IR id="123" name="Mul2_6379/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2c_bn_3" out_port_id="gpu_0/res5_0_branch2c_bn_3"/>
+		<IR id="201" name="gpu_0/res5_0_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2a_bn_1" out_port_id="gpu_0/res4_2_branch2a_bn_1"/>
+		<IR id="136" name="Mul2_6415/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2a_1" out_port_id="gpu_0/res2_2_branch2a_1"/>
+		<IR id="37" name="gpu_0/res2_2_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2a_bn_2" out_port_id="gpu_0/res4_1_branch2a_bn_2"/>
+		<IR id="124" name="gpu_0/res4_1_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2b_bn_1" out_port_id="gpu_0/res4_2_branch2b_bn_1"/>
+		<IR id="140" name="Mul2_6427/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2c_bn_3" out_port_id="gpu_0/res3_2_branch2c_bn_3"/>
+		<IR id="91" name="gpu_0/res3_2_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2b_bn_1" out_port_id="gpu_0/res3_0_branch2b_bn_1"/>
+		<IR id="56" name="Mul2_6187/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2c_bn_3" out_port_id="gpu_0/res2_2_branch2c_bn_3"/>
+		<IR id="49" name="gpu_0/res2_2_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2b_bn_1" out_port_id="gpu_0/res3_1_branch2b_bn_1"/>
+		<IR id="72" name="Mul2_6235/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2b_1" out_port_id="gpu_0/res3_1_branch2b_1"/>
+		<IR id="70" name="gpu_0/res3_1_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2c_bn_2" out_port_id="gpu_0/res4_1_branch2c_bn_2"/>
+		<IR id="132" name="gpu_0/res4_1_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2b_1" out_port_id="gpu_0/res5_0_branch2b_1"/>
+		<IR id="190" name="gpu_0/res5_0_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2a_bn_2" out_port_id="gpu_0/res5_0_branch2a_bn_2"/>
+		<IR id="189" name="gpu_0/res5_0_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res_conv1_bn_1" out_port_id="gpu_0/res_conv1_bn_1"/>
+		<IR id="5" name="Mul2_/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2c_bn_3" out_port_id="gpu_0/res4_2_branch2c_bn_3"/>
+		<IR id="146" name="gpu_0/res4_2_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2c_bn_2" out_port_id="gpu_0/res4_3_branch2c_bn_2"/>
+		<IR id="158" name="gpu_0/res4_3_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2b_bn_1" out_port_id="gpu_0/res3_2_branch2b_bn_1"/>
+		<IR id="85" name="Mul2_6271/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2b_1" out_port_id="gpu_0/res4_0_branch2b_1"/>
+		<IR id="109" name="gpu_0/res4_0_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2b_1" out_port_id="gpu_0/res3_0_branch2b_1"/>
+		<IR id="54" name="gpu_0/res3_0_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2b_bn_2" out_port_id="gpu_0/res5_2_branch2b_bn_2"/>
+		<IR id="222" name="gpu_0/res5_2_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2b_1" out_port_id="gpu_0/res2_0_branch2b_1"/>
+		<IR id="12" name="gpu_0/res2_0_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2a_bn_2" out_port_id="gpu_0/res2_1_branch2a_bn_2"/>
+		<IR id="27" name="gpu_0/res2_1_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/pred_1" out_port_id="gpu_0/pred_1"/>
+		<IR id="232" name="ScaleShift/MatMulBias_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/pool1_1" out_port_id="gpu_0/pool1_1"/>
+		<IR id="7" name="gpu_0/pool1_1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2a_bn_2" out_port_id="gpu_0/res4_0_branch2a_bn_2"/>
+		<IR id="108" name="gpu_0/res4_0_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2c_bn_2" out_port_id="gpu_0/res5_0_branch2c_bn_2"/>
+		<IR id="200" name="gpu_0/res5_0_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2c_bn_3" out_port_id="gpu_0/res3_3_branch2c_bn_3"/>
+		<IR id="104" name="gpu_0/res3_3_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2b_bn_1" out_port_id="gpu_0/res4_4_branch2b_bn_1"/>
+		<IR id="166" name="Mul2_6499/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2c_bn_3" out_port_id="gpu_0/res4_0_branch2c_bn_3"/>
+		<IR id="120" name="gpu_0/res4_0_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2c_1" out_port_id="gpu_0/res5_1_branch2c_1"/>
+		<IR id="210" name="gpu_0/res5_1_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2c_bn_2" out_port_id="gpu_0/res4_0_branch2c_bn_2"/>
+		<IR id="119" name="gpu_0/res4_0_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2a_bn_1" out_port_id="gpu_0/res4_5_branch2a_bn_1"/>
+		<IR id="175" name="Mul2_6523/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2b_bn_1" out_port_id="gpu_0/res2_2_branch2b_bn_1"/>
+		<IR id="43" name="Mul2_6151/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2b_1" out_port_id="gpu_0/res4_1_branch2b_1"/>
+		<IR id="125" name="gpu_0/res4_1_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2a_1" out_port_id="gpu_0/res4_0_branch2a_1"/>
+		<IR id="105" name="gpu_0/res4_0_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2b_bn_2" out_port_id="gpu_0/res4_0_branch2b_bn_2"/>
+		<IR id="112" name="gpu_0/res4_0_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2a_bn_1" out_port_id="gpu_0/res5_0_branch2a_bn_1"/>
+		<IR id="188" name="Mul2_6559/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2a_1" out_port_id="gpu_0/res5_1_branch2a_1"/>
+		<IR id="202" name="gpu_0/res5_1_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2c_bn_3" out_port_id="gpu_0/res5_2_branch2c_bn_3"/>
+		<IR id="227" name="gpu_0/res5_2_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2c_1" out_port_id="gpu_0/res5_2_branch2c_1"/>
+		<IR id="223" name="gpu_0/res5_2_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2b_1" out_port_id="gpu_0/res3_3_branch2b_1"/>
+		<IR id="96" name="gpu_0/res3_3_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2b_bn_2" out_port_id="gpu_0/res5_0_branch2b_bn_2"/>
+		<IR id="193" name="gpu_0/res5_0_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2c_bn_3" out_port_id="gpu_0/res3_0_branch2c_bn_3"/>
+		<IR id="65" name="gpu_0/res3_0_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2c_1" out_port_id="gpu_0/res4_3_branch2c_1"/>
+		<IR id="155" name="gpu_0/res4_3_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2a_1" out_port_id="gpu_0/res5_2_branch2a_1"/>
+		<IR id="215" name="gpu_0/res5_2_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2b_1" out_port_id="gpu_0/res4_3_branch2b_1"/>
+		<IR id="151" name="gpu_0/res4_3_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2a_1" out_port_id="gpu_0/res2_1_branch2a_1"/>
+		<IR id="24" name="gpu_0/res2_1_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2a_1" out_port_id="gpu_0/res3_1_branch2a_1"/>
+		<IR id="66" name="gpu_0/res3_1_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2c_1" out_port_id="gpu_0/res4_2_branch2c_1"/>
+		<IR id="142" name="gpu_0/res4_2_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2b_bn_2" out_port_id="gpu_0/res5_1_branch2b_bn_2"/>
+		<IR id="209" name="gpu_0/res5_1_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2a_bn_1" out_port_id="gpu_0/res5_1_branch2a_bn_1"/>
+		<IR id="204" name="Mul2_6607/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2c_bn_3" out_port_id="gpu_0/res3_1_branch2c_bn_3"/>
+		<IR id="78" name="gpu_0/res3_1_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2a_bn_1" out_port_id="gpu_0/res4_0_branch2a_bn_1"/>
+		<IR id="107" name="Mul2_6331/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2a_bn_2" out_port_id="gpu_0/res3_3_branch2a_bn_2"/>
+		<IR id="95" name="gpu_0/res3_3_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch1_1" out_port_id="gpu_0/res3_0_branch1_1"/>
+		<IR id="61" name="gpu_0/res3_0_branch1_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2c_bn_3" out_port_id="gpu_0/res5_1_branch2c_bn_3"/>
+		<IR id="214" name="gpu_0/res5_1_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2a_1" out_port_id="gpu_0/res2_0_branch2a_1"/>
+		<IR id="8" name="gpu_0/res2_0_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2a_bn_1" out_port_id="gpu_0/res4_4_branch2a_bn_1"/>
+		<IR id="162" name="Mul2_6487/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2b_bn_2" out_port_id="gpu_0/res4_1_branch2b_bn_2"/>
+		<IR id="128" name="gpu_0/res4_1_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2a_bn_1" out_port_id="gpu_0/res2_0_branch2a_bn_1"/>
+		<IR id="10" name="Mul2_6055/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2a_bn_1" out_port_id="gpu_0/res5_2_branch2a_bn_1"/>
+		<IR id="217" name="Mul2_6643/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2b_bn_2" out_port_id="gpu_0/res4_4_branch2b_bn_2"/>
+		<IR id="167" name="gpu_0/res4_4_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2a_bn_2" out_port_id="gpu_0/res5_1_branch2a_bn_2"/>
+		<IR id="205" name="gpu_0/res5_1_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2a_1" out_port_id="gpu_0/res4_2_branch2a_1"/>
+		<IR id="134" name="gpu_0/res4_2_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2b_1" out_port_id="gpu_0/res3_2_branch2b_1"/>
+		<IR id="83" name="gpu_0/res3_2_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2a_bn_2" out_port_id="gpu_0/res4_5_branch2a_bn_2"/>
+		<IR id="176" name="gpu_0/res4_5_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2b_bn_2" out_port_id="gpu_0/res4_5_branch2b_bn_2"/>
+		<IR id="180" name="gpu_0/res4_5_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2b_bn_1" out_port_id="gpu_0/res4_0_branch2b_bn_1"/>
+		<IR id="111" name="Mul2_6343/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2c_bn_3" out_port_id="gpu_0/res4_3_branch2c_bn_3"/>
+		<IR id="159" name="gpu_0/res4_3_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res_conv1_bn_2" out_port_id="gpu_0/res_conv1_bn_2"/>
+		<IR id="6" name="gpu_0/res_conv1_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2b_bn_2" out_port_id="gpu_0/res2_2_branch2b_bn_2"/>
+		<IR id="44" name="gpu_0/res2_2_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2c_bn_2" out_port_id="gpu_0/res3_2_branch2c_bn_2"/>
+		<IR id="90" name="gpu_0/res3_2_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2a_bn_1" out_port_id="gpu_0/res2_1_branch2a_bn_1"/>
+		<IR id="26" name="Mul2_6103/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2a_bn_1" out_port_id="gpu_0/res4_3_branch2a_bn_1"/>
+		<IR id="149" name="Mul2_6451/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2a_1" out_port_id="gpu_0/res3_0_branch2a_1"/>
+		<IR id="50" name="gpu_0/res3_0_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2c_bn_3" out_port_id="gpu_0/res2_0_branch2c_bn_3"/>
+		<IR id="23" name="gpu_0/res2_0_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2b_bn_2" out_port_id="gpu_0/res2_0_branch2b_bn_2"/>
+		<IR id="15" name="gpu_0/res2_0_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2c_bn_3" out_port_id="gpu_0/res4_4_branch2c_bn_3"/>
+		<IR id="172" name="gpu_0/res4_4_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2c_bn_2" out_port_id="gpu_0/res3_0_branch2c_bn_2"/>
+		<IR id="64" name="gpu_0/res3_0_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2a_bn_1" out_port_id="gpu_0/res3_0_branch2a_bn_1"/>
+		<IR id="52" name="Mul2_6175/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2b_1" out_port_id="gpu_0/res5_2_branch2b_1"/>
+		<IR id="219" name="gpu_0/res5_2_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/data_0" out_port_id="gpu_0/data_0"/>
+		<IR id="2" name="ScaleShift/Mul_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2c_bn_2" out_port_id="gpu_0/res5_1_branch2c_bn_2"/>
+		<IR id="213" name="gpu_0/res5_1_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2c_bn_2" out_port_id="gpu_0/res2_2_branch2c_bn_2"/>
+		<IR id="48" name="gpu_0/res2_2_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2b_1" out_port_id="gpu_0/res4_2_branch2b_1"/>
+		<IR id="138" name="gpu_0/res4_2_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2c_1" out_port_id="gpu_0/res2_2_branch2c_1"/>
+		<IR id="45" name="gpu_0/res2_2_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2a_bn_2" out_port_id="gpu_0/res2_2_branch2a_bn_2"/>
+		<IR id="40" name="gpu_0/res2_2_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2c_bn_3" out_port_id="gpu_0/res2_1_branch2c_bn_3"/>
+		<IR id="36" name="gpu_0/res2_1_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2a_1" out_port_id="gpu_0/res4_4_branch2a_1"/>
+		<IR id="160" name="gpu_0/res4_4_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2c_1" out_port_id="gpu_0/res2_0_branch2c_1"/>
+		<IR id="16" name="gpu_0/res2_0_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2a_1" out_port_id="gpu_0/res4_3_branch2a_1"/>
+		<IR id="147" name="gpu_0/res4_3_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2c_1" out_port_id="gpu_0/res2_1_branch2c_1"/>
+		<IR id="32" name="gpu_0/res2_1_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="OC2_DUMMY_1" out_port_id="OC2_DUMMY_1"/>
+		<IR id="229" name="OC2_DUMMY_1/Output_0/Data__const" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2a_bn_1" out_port_id="gpu_0/res3_2_branch2a_bn_1"/>
+		<IR id="81" name="Mul2_6259/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2a_bn_2" out_port_id="gpu_0/res4_3_branch2a_bn_2"/>
+		<IR id="150" name="gpu_0/res4_3_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2b_1" out_port_id="gpu_0/res4_4_branch2b_1"/>
+		<IR id="164" name="gpu_0/res4_4_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2b_bn_2" out_port_id="gpu_0/res3_2_branch2b_bn_2"/>
+		<IR id="86" name="gpu_0/res3_2_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2a_1" out_port_id="gpu_0/res3_3_branch2a_1"/>
+		<IR id="92" name="gpu_0/res3_3_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2a_bn_2" out_port_id="gpu_0/res5_2_branch2a_bn_2"/>
+		<IR id="218" name="gpu_0/res5_2_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_4_branch2a_bn_2" out_port_id="gpu_0/res4_4_branch2a_bn_2"/>
+		<IR id="163" name="gpu_0/res4_4_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2a_bn_2" out_port_id="gpu_0/res3_1_branch2a_bn_2"/>
+		<IR id="69" name="gpu_0/res3_1_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2c_1" out_port_id="gpu_0/res3_1_branch2c_1"/>
+		<IR id="74" name="gpu_0/res3_1_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2c_bn_2" out_port_id="gpu_0/res5_2_branch2c_bn_2"/>
+		<IR id="226" name="gpu_0/res5_2_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2c_1" out_port_id="gpu_0/res4_1_branch2c_1"/>
+		<IR id="129" name="gpu_0/res4_1_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2a_bn_2" out_port_id="gpu_0/res3_2_branch2a_bn_2"/>
+		<IR id="82" name="gpu_0/res3_2_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/pool5_1" out_port_id="gpu_0/pool5_1"/>
+		<IR id="228" name="gpu_0/pool5_1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_0_branch2c_1" out_port_id="gpu_0/res4_0_branch2c_1"/>
+		<IR id="113" name="gpu_0/res4_0_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2c_1" out_port_id="gpu_0/res5_0_branch2c_1"/>
+		<IR id="194" name="gpu_0/res5_0_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2c_bn_2" out_port_id="gpu_0/res2_1_branch2c_bn_2"/>
+		<IR id="35" name="gpu_0/res2_1_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2a_bn_1" out_port_id="gpu_0/res3_3_branch2a_bn_1"/>
+		<IR id="94" name="Mul2_6295/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2c_bn_2" out_port_id="gpu_0/res4_5_branch2c_bn_2"/>
+		<IR id="184" name="gpu_0/res4_5_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2a_1" out_port_id="gpu_0/res4_5_branch2a_1"/>
+		<IR id="173" name="gpu_0/res4_5_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2b_bn_1" out_port_id="gpu_0/res4_1_branch2b_bn_1"/>
+		<IR id="127" name="Mul2_6391/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2b_bn_2" out_port_id="gpu_0/res2_1_branch2b_bn_2"/>
+		<IR id="31" name="gpu_0/res2_1_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2b_bn_2" out_port_id="gpu_0/res3_3_branch2b_bn_2"/>
+		<IR id="99" name="gpu_0/res3_3_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2c_1" out_port_id="gpu_0/res3_0_branch2c_1"/>
+		<IR id="58" name="gpu_0/res3_0_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2a_1" out_port_id="gpu_0/res5_0_branch2a_1"/>
+		<IR id="186" name="gpu_0/res5_0_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_2_branch2b_bn_1" out_port_id="gpu_0/res5_2_branch2b_bn_1"/>
+		<IR id="221" name="Mul2_6655/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2b_1" out_port_id="gpu_0/res5_1_branch2b_1"/>
+		<IR id="206" name="gpu_0/res5_1_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2b_bn_1" out_port_id="gpu_0/res2_0_branch2b_bn_1"/>
+		<IR id="14" name="Mul2_6067/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2c_bn_3" out_port_id="gpu_0/res4_1_branch2c_bn_3"/>
+		<IR id="133" name="gpu_0/res4_1_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2b_bn_2" out_port_id="gpu_0/res3_0_branch2b_bn_2"/>
+		<IR id="57" name="gpu_0/res3_0_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2c_bn_2" out_port_id="gpu_0/res2_0_branch2c_bn_2"/>
+		<IR id="22" name="gpu_0/res2_0_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2b_bn_1" out_port_id="gpu_0/res3_3_branch2b_bn_1"/>
+		<IR id="98" name="Mul2_6307/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2a_bn_1" out_port_id="gpu_0/res2_2_branch2a_bn_1"/>
+		<IR id="39" name="Mul2_6139/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2c_bn_3" out_port_id="gpu_0/res4_5_branch2c_bn_3"/>
+		<IR id="185" name="gpu_0/res4_5_branch2c_bn_3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2b_bn_2" out_port_id="gpu_0/res3_1_branch2b_bn_2"/>
+		<IR id="73" name="gpu_0/res3_1_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_2_branch2c_bn_2" out_port_id="gpu_0/res4_2_branch2c_bn_2"/>
+		<IR id="145" name="gpu_0/res4_2_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/softmax_1" out_port_id="0"/>
+		<IR id="233" name="gpu_0/softmax_1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_0_branch2a_bn_2" out_port_id="gpu_0/res3_0_branch2a_bn_2"/>
+		<IR id="53" name="gpu_0/res3_0_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_5_branch2b_bn_1" out_port_id="gpu_0/res4_5_branch2b_bn_1"/>
+		<IR id="179" name="Mul2_6535/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_1_branch2b_bn_1" out_port_id="gpu_0/res5_1_branch2b_bn_1"/>
+		<IR id="208" name="Mul2_6619/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2a_bn_1" out_port_id="gpu_0/res3_1_branch2a_bn_1"/>
+		<IR id="68" name="Mul2_6223/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch1_1" out_port_id="gpu_0/res2_0_branch1_1"/>
+		<IR id="19" name="gpu_0/res2_0_branch1_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_2_branch2b_1" out_port_id="gpu_0/res2_2_branch2b_1"/>
+		<IR id="41" name="gpu_0/res2_2_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_3_branch2b_bn_2" out_port_id="gpu_0/res4_3_branch2b_bn_2"/>
+		<IR id="154" name="gpu_0/res4_3_branch2b_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch2b_bn_1" out_port_id="gpu_0/res5_0_branch2b_bn_1"/>
+		<IR id="192" name="Mul2_6571/FusedScaleShift_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res5_0_branch1_1" out_port_id="gpu_0/res5_0_branch1_1"/>
+		<IR id="197" name="gpu_0/res5_0_branch1_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res4_1_branch2a_1" out_port_id="gpu_0/res4_1_branch2a_1"/>
+		<IR id="121" name="gpu_0/res4_1_branch2a_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_1_branch2b_1" out_port_id="gpu_0/res2_1_branch2b_1"/>
+		<IR id="28" name="gpu_0/res2_1_branch2b_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_1_branch2c_bn_2" out_port_id="gpu_0/res3_1_branch2c_bn_2"/>
+		<IR id="77" name="gpu_0/res3_1_branch2c_bn_2/sum_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_2_branch2c_1" out_port_id="gpu_0/res3_2_branch2c_1"/>
+		<IR id="87" name="gpu_0/res3_2_branch2c_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/conv1_1" out_port_id="gpu_0/conv1_1"/>
+		<IR id="3" name="gpu_0/conv1_1" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res2_0_branch2a_bn_2" out_port_id="gpu_0/res2_0_branch2a_bn_2"/>
+		<IR id="11" name="gpu_0/res2_0_branch2a_bn_2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="OC2_DUMMY_0" out_port_id="OC2_DUMMY_0"/>
+		<IR id="230" name="OC2_DUMMY_0" out_port_id="2"/>
+	</map>
+	<map>
+		<framework name="gpu_0/res3_3_branch2c_1" out_port_id="gpu_0/res3_3_branch2c_1"/>
+		<IR id="100" name="gpu_0/res3_3_branch2c_1" out_port_id="2"/>
+	</map>
+</mapping>

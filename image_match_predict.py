@@ -542,10 +542,10 @@ class gui(tk.Tk):
 
             self.panelCamRep = tk.Label(self.masterframe, image=self.reprojection)
             self.panelCamRep.image = self.reprojection
-            self.panelCamRep.grid(in_=self.masterframe, row=0, column=2, columnspan=2, rowspan=2, padx=10, pady=10, sticky='ne')
+            self.panelCamRep.grid(in_=self.masterframe, row=0, column=2, rowspan=2, padx=10, pady=10, sticky='ne')
 
             button = tk.Button(self.masterframe, text="Capture Location", command=self.run_capture)
-            button.grid(in_=self.masterframe, row=2, column=2, padx=10, pady=10)
+            button.grid(in_=self.masterframe, row=2, column=2, padx=10, pady=10, sticky='ne')
 
         else:
             # update the panels
@@ -612,7 +612,8 @@ class gui(tk.Tk):
 
         features, labels = iterator.get_next()
 
-        #exec_net = ie.load_network(network=net, device_name=ARGS.device)
+        # load network to movidius device
+        exec_net = ie.load_network(network=net, device_name=ARGS.device)
 
         with tf.compat.v1.Session() as sess:
 
@@ -620,22 +621,22 @@ class gui(tk.Tk):
 
             try:
                 while True:
-                    image = sess.run([features, labels])
+                    image, metadata = sess.run([features, labels])
 
-                    tile1_image = tf.cast(features["tile1_img"], tf.uint8)
-                    tile2_image = tf.cast(features["tile2_img"], tf.uint8)
+                    tile1_image = features["tile1_img"]
+                    tile2_image = features["tile2_img"]
 
                     tile1_image = tf.reshape(tile1_image, (-1, INPUT_HEIGHT, INPUT_WIDTH))
                     tile2_image = tf.reshape(tile2_image, (-1, INPUT_HEIGHT, INPUT_WIDTH))
 
-                    tile1_image = tf.stack((tile1_image, tile1_image, tile1_image), axis=3)[0]
-                    tile2_image = tf.stack((tile2_image, tile2_image, tile2_image), axis=3)[0]
+                    tile1_image = tf.cast(tile1_image, tf.uint8)
+                    tile2_image = tf.cast(tile2_image, tf.uint8)
 
-                    self.tf_reprojection = Image.fromarray(tile1_image.eval())
+                    self.tf_reprojection = Image.fromarray(tile1_image[0].eval())
                     self.tf_reprojection = self.tf_reprojection.resize((448, 448), Image.NEAREST)
                     self.tf_reprojection = ImageTk.PhotoImage(image=self.tf_reprojection)
 
-                    self.tf_satellite = Image.fromarray(tile2_image.eval())
+                    self.tf_satellite = Image.fromarray(tile2_image[0].eval())
                     self.tf_satellite = self.tf_satellite.resize((448, 448), Image.NEAREST)
                     self.tf_satellite = ImageTk.PhotoImage(image=self.tf_satellite)
 
@@ -655,8 +656,11 @@ class gui(tk.Tk):
                     # cv.waitKey(0)
                     # cv.destroyAllWindows()
 
-                    #res1 = exec_net.infer(inputs={input_blob: img1})
-                    #res2 = exec_net.infer(inputs={input_blob: tile1_image.eval()})
+                    # extract feature vectors from MYRIAD device
+                    res1 = exec_net.infer(inputs={input_blob: tile1_image.eval()})
+                    res2 = exec_net.infer(inputs={input_blob: tile2_image.eval()})
+
+
 
 
             except tf.errors.OutOfRangeError:
