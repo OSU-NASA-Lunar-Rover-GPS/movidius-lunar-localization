@@ -17,7 +17,7 @@ from PIL import ImageTk
 import tensorflow as tf
 import tensorflow_hub as hub
 # openvino
-from openvino.inference_engine import IENetwork, IECore, IEPlugin
+from openvino.inference_engine import IENetwork, IECore
 import cv2 as cv
 # stepper motor
 import subprocess
@@ -29,7 +29,7 @@ PREDICT_BATCH_SIZE = 10
 LMBDA = 100
 INPUT_WIDTH = 224
 INPUT_HEIGHT = 224
-MODEL_XML = "./ovino_model/model.xml"
+MODEL_XML = "./ovino_model/model.ckpt-370000.xml"
 #MODEL_XML = "./ovino_model/model.ckpt-370000.xml" # pretrained tensorflow v1 model
 MODEL_BIN = os.path.splitext(MODEL_XML)[0] + ".bin"
 CAMERA_DEVICE_NUMBER = 0
@@ -585,6 +585,7 @@ class gui(tk.Tk):
         ie = IECore()
         net = IENetwork(model=MODEL_XML, weights=MODEL_BIN)
 
+        # check for unsupported layers in model with respect to the chosen device
         if "MYRIAD" in ARGS.device:
             supported_layers = ie.query_network(net, "MYRIAD")
             not_supported_layers = [l for l in net.layers.keys() if l not in supported_layers]
@@ -657,8 +658,8 @@ class gui(tk.Tk):
                     # cv.destroyAllWindows()
 
                     # extract feature vectors from MYRIAD device
-                    res1 = exec_net.infer(inputs={input_blob: tile1_image.eval()})
-                    res2 = exec_net.infer(inputs={input_blob: tile2_image.eval()})
+                    res1 = exec_net.infer(inputs={input_blob: [tile1_image.eval(),tile2_image.eval()]})
+                    #res2 = exec_net.infer(inputs={input_blob: tile2_image.eval()})
 
 
 
