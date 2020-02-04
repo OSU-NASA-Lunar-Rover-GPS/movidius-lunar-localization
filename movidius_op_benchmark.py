@@ -32,6 +32,7 @@ end_time = time.time_ns()
 # calculate run time
 run_time = (end_time-start_time)/(load_count*1000000000)
 
+# print result
 print('Seconds per model load (averaged over ' + str(load_count) + ' load operations): ' + str(run_time))
 
 # generate random image
@@ -50,5 +51,5 @@ end_time = time.time_ns()
 # calculate run time
 run_time = (end_time-start_time)/(inference_count*1000000000)
 
-#print result
+# print result
 print('Seconds per inference (averaged over ' + str(inference_count) + ' inferences): ' + str(run_time))
