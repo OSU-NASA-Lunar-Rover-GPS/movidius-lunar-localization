@@ -644,18 +644,18 @@ class gui(tk.Tk):
                     self.update_tf_images()
                     time.sleep(3)
 
-                    ## view tfrecord images for debugging
-                    # cv.namedWindow('image0', cv.WINDOW_NORMAL)
-                    # cv.namedWindow('image1', cv.WINDOW_NORMAL)
-                    #
-                    # cv.imshow('image0', img1)
-                    # cv.imshow('image1', img2)
-                    #
-                    # cv.resizeWindow('image0', 800, 800)
-                    # cv.resizeWindow('image1', 800, 800)
-                    #
-                    # cv.waitKey(0)
-                    # cv.destroyAllWindows()
+                    # view tfrecord images for debugging
+                    cv.namedWindow('image0', cv.WINDOW_NORMAL)
+                    cv.namedWindow('image1', cv.WINDOW_NORMAL)
+
+                    cv.imshow('image0', img1)
+                    cv.imshow('image1', img2)
+
+                    cv.resizeWindow('image0', 800, 800)
+                    cv.resizeWindow('image1', 800, 800)
+
+                    cv.waitKey(0)
+                    cv.destroyAllWindows()
 
                     # extract feature vectors from MYRIAD device
                     res1 = exec_net.infer(inputs={input_blob: [tile1_image.eval(),tile2_image.eval()]})
