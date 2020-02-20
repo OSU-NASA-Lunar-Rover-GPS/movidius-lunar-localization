@@ -11,8 +11,7 @@ from argparse import ArgumentParser, SUPPRESS
 import threading
 # interface
 import tkinter as tk
-from PIL import Image
-from PIL import ImageTk
+from PIL import Image, ImageTk
 # tensorflow
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -25,12 +24,12 @@ import yaml
 
 
 
-PREDICT_BATCH_SIZE = 10
+PREDICT_BATCH_SIZE = 1
 LMBDA = 100
 INPUT_WIDTH = 224
 INPUT_HEIGHT = 224
-MODEL_XML = "./ovino_model/model.ckpt-370000.xml"
-#MODEL_XML = "./ovino_model/model.ckpt-370000.xml" # pretrained tensorflow v1 model
+PREDICT_DATASET='./reproject_truematch_allbatch_5050match_224scale_06iou.tfr'
+MODEL_XML = "./ovino_model/resnet50v2.xml"
 MODEL_BIN = os.path.splitext(MODEL_XML)[0] + ".bin"
 CAMERA_DEVICE_NUMBER = 0
 ARGS = None
@@ -403,6 +402,43 @@ def rotate(points, angle, anchor=(0, 0)):
 
 
 
+# parse tensorflow example
+def _input_parser(example):
+
+    features = {
+        'height': tf.io.FixedLenFeature((), tf.int64),
+        'width': tf.io.FixedLenFeature((), tf.int64),
+        'offset_y': tf.io.FixedLenFeature((), tf.float32),
+        'offset_x': tf.io.FixedLenFeature((), tf.float32),
+        'match': tf.io.FixedLenFeature((), tf.int64),
+        'iou': tf.io.FixedLenFeature((), tf.float32),
+        'tile1_raw': tf.io.FixedLenFeature((), tf.string),
+        'tile2_raw': tf.io.FixedLenFeature((), tf.string)
+    }
+
+    parsed_example = tf.io.parse_single_example(example, features)
+
+    width = parsed_example['width']
+    height = parsed_example['height']
+
+    tile1_img = tf.io.decode_raw(parsed_example['tile1_raw'], tf.float64)
+    tile2_img = tf.io.decode_raw(parsed_example['tile2_raw'], tf.float64)
+
+    match = parsed_example['match']
+    offset_x = parsed_example['offset_x']
+    offset_y = parsed_example['offset_y']
+
+    return { "tile1_img": tile1_img,
+             "tile2_img": tile2_img,
+             "width": width,
+             "height": height}, \
+                {   'match': match,
+                    'offset_x': offset_x,
+                    'offset_y': offset_y
+                }
+
+
+
 class gui(tk.Tk):
 
     def __init__(self, parent, *args, **kwargs):
@@ -419,15 +455,24 @@ class gui(tk.Tk):
         self.panelCam180 = None
         self.panelCam270 = None
         self.panelCamRep = None
+
         self.panelTFRep = None
+        self.panelTFSat = None
+
+        self.panelMatch = None
+        self.panelPrediction = None
 
         self.cam_img = [None, None, None, None]
+
         self.reprojection = None
         self.tf_reprojection = None
         self.tf_satellite = None
 
         self.cam_threads = []
         self.rep_thread = None
+
+        self.match = "Dataset: Not Available"
+        self.prediction = "Prediction: Not Available"
 
         return
 
@@ -604,11 +649,10 @@ class gui(tk.Tk):
         output_blob = next(iter(net.outputs))
 
         # load tensorflow record
-        predict_dataset = tf.data.TFRecordDataset('reproject_truematch_allbatch_5050match_224scale_06iou.tfr')
+        predict_dataset = tf.data.TFRecordDataset(PREDICT_DATASET)
 
         predict_dataset = predict_dataset.map(_input_parser)
-        predict_dataset = predict_dataset.batch(1)
-        #predict_dataset = predict_dataset.batch(PREDICT_BATCH_SIZE)
+        predict_dataset = predict_dataset.batch(PREDICT_BATCH_SIZE)
         iterator = tf.compat.v1.data.make_one_shot_iterator(predict_dataset)
 
         features, labels = iterator.get_next()
@@ -624,14 +668,17 @@ class gui(tk.Tk):
                 while True:
                     image, metadata = sess.run([features, labels])
 
-                    tile1_image = features["tile1_img"]
-                    tile2_image = features["tile2_img"]
+                    tile1_src = image["tile1_img"]
+                    tile2_src = image["tile2_img"]
 
-                    tile1_image = tf.reshape(tile1_image, (-1, INPUT_HEIGHT, INPUT_WIDTH))
-                    tile2_image = tf.reshape(tile2_image, (-1, INPUT_HEIGHT, INPUT_WIDTH))
+                    tile1_src = tf.reshape(tile1_src, (-1, INPUT_HEIGHT, INPUT_WIDTH))
+                    tile2_src = tf.reshape(tile2_src, (-1, INPUT_HEIGHT, INPUT_WIDTH))
 
-                    tile1_image = tf.cast(tile1_image, tf.uint8)
-                    tile2_image = tf.cast(tile2_image, tf.uint8)
+                    tile1_stacked = tf.stack((tile1_src, tile1_src, tile1_src), axis=1)
+                    tile2_stacked = tf.stack((tile2_src, tile2_src, tile2_src), axis=1)
+
+                    tile1_image = tf.cast(tile1_src*255, tf.uint8)
+                    tile2_image = tf.cast(tile2_src*255, tf.uint8)
 
                     self.tf_reprojection = Image.fromarray(tile1_image[0].eval())
                     self.tf_reprojection = self.tf_reprojection.resize((448, 448), Image.NEAREST)
@@ -641,25 +688,17 @@ class gui(tk.Tk):
                     self.tf_satellite = self.tf_satellite.resize((448, 448), Image.NEAREST)
                     self.tf_satellite = ImageTk.PhotoImage(image=self.tf_satellite)
 
+                    # extract feature vectors from MYRIAD device
+                    res1 = exec_net.infer(inputs={input_blob: tile1_stacked.eval()})
+                    res2 = exec_net.infer(inputs={input_blob: tile2_stacked.eval()})
+
+                    if metadata['match']:
+                        self.match = "Dataset: Match"
+                    else:
+                        self.match = "Dataset: No Match"
+
                     self.update_tf_images()
                     time.sleep(3)
-
-                    # view tfrecord images for debugging
-                    cv.namedWindow('image0', cv.WINDOW_NORMAL)
-                    cv.namedWindow('image1', cv.WINDOW_NORMAL)
-
-                    cv.imshow('image0', img1)
-                    cv.imshow('image1', img2)
-
-                    cv.resizeWindow('image0', 800, 800)
-                    cv.resizeWindow('image1', 800, 800)
-
-                    cv.waitKey(0)
-                    cv.destroyAllWindows()
-
-                    # extract feature vectors from MYRIAD device
-                    res1 = exec_net.infer(inputs={input_blob: [tile1_image.eval(),tile2_image.eval()]})
-                    #res2 = exec_net.infer(inputs={input_blob: tile2_image.eval()})
 
 
 
@@ -713,6 +752,12 @@ class gui(tk.Tk):
             self.panelTFSat.image = self.tf_satellite
             self.panelTFSat.grid(in_=self.masterframe, row=2, column=1, padx=10, pady=10)
 
+            self.panelMatch = tk.Label(self.masterframe, text=self.match)
+            self.panelMatch.grid(in_=self.masterframe, row=3, column=2, padx=10, pady=10, sticky='nw')
+
+            self.panelPrediction = tk.Label(self.masterframe, text=self.prediction)
+            self.panelPrediction.grid(in_=self.masterframe, row=3, column=3, padx=10, pady=10, sticky='nw')
+
         else:
 
             self.panelTFRep.configure(image=self.tf_reprojection)
@@ -721,42 +766,11 @@ class gui(tk.Tk):
             self.panelTFSat.configure(image=self.tf_satellite)
             self.panelTFSat.image = self.tf_satellite
 
+            self.panelMatch.configure(text=self.match)
+            self.panelPrediction.configure(text=self.prediction)
+
+
         return
-
-
-
-# parse tensorflow example
-def _input_parser(example):
-
-    features = {
-        'height': tf.io.FixedLenFeature((), tf.int64),
-        'width': tf.io.FixedLenFeature((), tf.int64),
-        'offset_y': tf.io.FixedLenFeature((), tf.float32),
-        'offset_x': tf.io.FixedLenFeature((), tf.float32),
-        'match': tf.io.FixedLenFeature((), tf.int64),
-        'iou': tf.io.FixedLenFeature((), tf.float32),
-        'tile1_raw': tf.io.FixedLenFeature((), tf.string),
-        'tile2_raw': tf.io.FixedLenFeature((), tf.string)
-    }
-
-    parsed_example = tf.io.parse_single_example(example, features)
-    width = parsed_example['width']
-    height = parsed_example['height']
-    tile1_img = tf.io.decode_raw(parsed_example['tile1_raw'], tf.int64)
-    tile2_img = tf.io.decode_raw(parsed_example['tile2_raw'], tf.int64)
-
-    match = parsed_example['match']
-    offset_x = parsed_example['offset_x']
-    offset_y = parsed_example['offset_y']
-
-    return { "tile1_img": tile1_img,
-             "tile2_img": tile2_img,
-             "width": width,
-             "height": height}, \
-                {   'match': match,
-                    'offset_x': offset_x,
-                    'offset_y': offset_y
-                }
 
 
 
