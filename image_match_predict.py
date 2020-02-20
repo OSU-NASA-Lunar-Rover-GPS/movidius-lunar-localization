@@ -746,17 +746,17 @@ class gui(tk.Tk):
 
             self.panelTFRep = tk.Label(self.masterframe, image=self.tf_reprojection)
             self.panelTFRep.image = self.tf_reprojection
-            self.panelTFRep.grid(in_=self.masterframe, row=2, column=0, padx=10, pady=10)
+            self.panelTFRep.grid(in_=self.masterframe, row=2, rowspan=2, column=0, padx=10, pady=10)
 
             self.panelTFSat = tk.Label(self.masterframe, image=self.tf_satellite)
             self.panelTFSat.image = self.tf_satellite
-            self.panelTFSat.grid(in_=self.masterframe, row=2, column=1, padx=10, pady=10)
+            self.panelTFSat.grid(in_=self.masterframe, row=2, rowspan=2, column=1, padx=10, pady=10)
 
             self.panelMatch = tk.Label(self.masterframe, text=self.match)
-            self.panelMatch.grid(in_=self.masterframe, row=3, column=2, padx=10, pady=10, sticky='nw')
+            self.panelMatch.grid(in_=self.masterframe, row=2, column=2, padx=10, pady=10, sticky='sw')
 
             self.panelPrediction = tk.Label(self.masterframe, text=self.prediction)
-            self.panelPrediction.grid(in_=self.masterframe, row=3, column=3, padx=10, pady=10, sticky='nw')
+            self.panelPrediction.grid(in_=self.masterframe, row=3, column=2, padx=10, pady=10, sticky='nw')
 
         else:
 
