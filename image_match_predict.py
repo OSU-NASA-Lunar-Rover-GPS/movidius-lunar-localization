@@ -524,7 +524,7 @@ class gui(tk.Tk):
                     timout_length = timeout_length - sleep_length
 
                 # handle timout condition
-                if timout_length <= 0:
+                if timeout_length <= 0:
                     print('ERROR: Stepper controller failed to assume the provided position.')
                     return
             else:
