@@ -1,7 +1,7 @@
 # Movidius Lunar Localization
 
 ## Background
-This is the repository for our NASA Lunar Localization Senior Design Project, developed for Intel. It aims to build off of the NASA Frontier Development Lab's research into an approach to [Localization on the Moon Using a Neural Network Model](https://ieeexplore.ieee.org/document/8968124). The project aims to run a trained neural network model off of an Intel Neural Compute Stick 2 USB device. The model processes ground view images of the lunar landscape captured by a camera and then reprojects them into an approximated top-down view image of the surrounding landscape and then tries to match them with actual top-down images of the same locations from the databa
+This is the repository for our NASA Lunar Localization Senior Design Project, developed for Intel. It aims to build off of the NASA Frontier Development Lab's research into an approach to [Localization on the Moon Using a Neural Network Model](https://ieeexplore.ieee.org/document/8968124). The project aims to run a trained neural network model off of an Intel Neural Compute Stick 2 USB device. The model processes ground view images of the lunar landscape captured by a camera and then reprojects them into an approximated top-down view image of the surrounding landscape and then compares those images to satellite gathered aerial images via a neural network in order to determine a rover's location.
 
 ## Dependencies/Requirements for Development
 The project requires a great number of dependencies as well as hardware in order to set up the environment for a local build that runs the neural network model off the Compute Stick. More detailed instructions for a local build will be compiled and uploaded later.
