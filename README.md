@@ -28,4 +28,4 @@ The project also requires these hardware components in order to run as intended:
 **image_match_predict.py** - Contains the bulk of our implementation, including camera capture function, stepper motor functionality,  image reprojection, and final reprojected image display onto a GUI. The **run.py** script runs the whole process.
 
 ## Description
-With the environment fully set up and all hardware connected, run "source /opt/intel/openvino/bin/setupvars.sh" to load the OpenVINO environment in order to utilize the Compute Stick. Then running **run.py** from the directory will open up the GUI so that we can begin image capturing and reprojection.
+With the environment fully set up and all hardware connected, run "source /opt/intel/openvino/bin/setupvars.sh" to load the OpenVINO environment in order to utilize the Compute Stick. From this directory, executing the **run.py** file will open the GUI so that image capture and reprojection can begin.
