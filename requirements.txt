@@ -1,4 +1,4 @@
 tensorflow==2.1.0
 numpy==1.18.1
 tensorflow_hub==0.7.0
-Pillow==7.0.0
+Pillow==9.3.0
